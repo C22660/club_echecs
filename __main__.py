@@ -30,7 +30,8 @@ def main():
     player_1 = Player(name=name, first_name=first_name, birth=birth, sex=sex, ranking=ranking)"""
 
 
-# A NOTER POUR LE DEMARRAGE
+# A NOTER POUR LE DEMARRAGE (la App et ce que l'on peut appeler le main)
+# renommer le fichier __main__.py pour être xecuter par python -m code_centre_echecs
 # app = ApplicationController()
 # app.start()
 
