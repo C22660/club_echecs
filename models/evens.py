@@ -1,3 +1,4 @@
+from operator import attrgetter
 """Les pairs correspondent au sytème de répartition des joueurs.
     Ici, elle est basée sur le système Suisse
     à mettre dans les tournois
@@ -6,7 +7,6 @@
 """ prévoir un %2 de la len de liste en allere et si liste impaire, 
 ne pas faire l'affectation et demander un joueur de plus"""
 
-from operator import attrgetter
 
 class Evens:
 
@@ -45,9 +45,3 @@ class Evens:
     def make_a_random(self):
         """Tire au sort les couleurs"""
         pass
-
-
-
-
-if __name__ == '__main__':
-    main()
