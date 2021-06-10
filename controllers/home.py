@@ -1,5 +1,7 @@
 from tools.menus import Menu
 from views.views import HomeMenuView
+from views.views import get_tournament_elements
+from models.tournaments import Tournament
 
 """les inputs ici"""
 
@@ -10,8 +12,11 @@ class ApplicationController:
 
     def start(self):
         # au démarrage, on instancie le HomeMenuController
+        # actions = ({"Créer un tournoi" : "NewTournamentController()"}, {"Saisir / modifier la liste des joueurs":
+        #             "PlayersController()"}, {"Démarrer le tournoi": "NewRoundController()"}
+        #             )
         self.controller = HomeMenuController()
-        # tant que seil.controller n'est pas None (donc while true), l'appli continue de tourner
+        # tant que sefl.controller n'est pas None (donc while true), l'appli continue de tourner
         while self.controller:
             # si pas __call, self.controller.run()
             self.controller = self.controller()
@@ -40,7 +45,7 @@ class HomeMenuController:
         # la clé pourrait être directement un chiffre, ou une auto numérotation, ou q pour qitter
         # en placant () après le controller, cela veut dire qu'on l'instancie directement
         self.menu.add("auto", "Créer un tournoi", NewTournamentController())
-        self.menu.add("auto", "Saisir la liste des joueurs", PlayersController())
+        self.menu.add("auto", "Saisir / modifier la liste des joueurs", PlayersController())
         self.menu.add("auto", "Démarrer le tournoi", NewRoundController())
         self.menu.add("q", "Quitter", EndScreenController())
 
@@ -64,8 +69,15 @@ class SignupMenuController:
 # Création d'un nouveau tournoi
 class NewTournamentController:
     def __call__(self):
-        print("dans le controleur nouveau tournoi")
-        return EndScreenController()
+        # 1 générer les inputs
+        elements = get_tournament_elements()
+        # print(elements)
+        # 2 instancier un tournoi
+        new_tournament = Tournament(*elements)
+        new_tournament.add_handcraft_inputs()
+        # print(new_tournament.tournament)
+        # 3 retour au menu général
+        return PlayersController()
 
 # Saisie des joueurs
 class PlayersController:
@@ -74,7 +86,7 @@ class PlayersController:
         # return ???
 
 # Saisie des joueurs
-class NewRoundController():
+class NewRoundController:
     def __call__(self):
         print("Lancement des matches")
         # return ???

@@ -40,7 +40,7 @@ class Player:
         return Evens.sort_players_ranking(self.team_players)
 
     def generate_another_teams(self):
-        """Adresse la liste des joueurs à Evens pour création des premières suivantes.
+        """Adresse la liste des joueurs à Evens pour création des paires suivantes.
         """
         return Evens.sort_players_points(self.team_players)
 
@@ -60,6 +60,9 @@ class Player:
         print(serialized_player["ranking"])
 
         # self.all_players[Player.player_id][serialized_player]
+
+    def modifie_player_ranking(self):
+        pass
 
     def serialized(self):
         pass
