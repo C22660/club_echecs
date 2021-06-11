@@ -1,6 +1,8 @@
 from tools.menus import Menu
-from views.views import HomeMenuView
-from views.views import get_tournament_elements
+from views import views
+from models.players import Player
+# from views.views import HomeMenuView
+# from views.views import get_tournament_elements
 from models.tournaments import Tournament
 
 """les inputs ici"""
@@ -33,7 +35,7 @@ class HomeMenuController:
         # on crée donc un menu et avec le add du call, on lui passe des instructions
         self.menu = Menu()
         # et on envoi le menu à la vue
-        self.view = HomeMenuView(self.menu)
+        self.view = views.HomeMenuView(self.menu)
 
     # au lieu de call, on pourrait faire def run(self):
     # la méthode spéciale call permet d'exécuter directement le controller self.controller()
@@ -44,6 +46,23 @@ class HomeMenuController:
         # self.menu.add(key, option, controller associé à cette option)
         # la clé pourrait être directement un chiffre, ou une auto numérotation, ou q pour qitter
         # en placant () après le controller, cela veut dire qu'on l'instancie directement
+        self.menu.add("auto", "Créer un tournoi", NewTournamentController())
+        self.menu.add("auto", "Saisir / modifier la liste des joueurs", PlayersController())
+        self.menu.add("auto", "Démarrer le tournoi", NewRoundController())
+        self.menu.add("q", "Quitter", EndScreenController())
+
+        # 2. Demander à la vue d'afficher le menu et de collecter la réponse de l'utilisateur (video 50')
+        user_choice = self.view.get_user_choice()
+
+        # 3. Retourner le controller associé au choix de l'utilisateur au contrôleur principal
+        return user_choice.handler
+
+class PlayerMenuController:
+    def __init__(self):
+        self.menu = Menu()
+        self.view = views.HomeMenuView(self.menu)
+
+    def __call__(self):
         self.menu.add("auto", "Créer un tournoi", NewTournamentController())
         self.menu.add("auto", "Saisir / modifier la liste des joueurs", PlayersController())
         self.menu.add("auto", "Démarrer le tournoi", NewRoundController())
@@ -68,22 +87,41 @@ class SignupMenuController:
 
 # Création d'un nouveau tournoi
 class NewTournamentController:
+    """Contrôleur responsable de gérer le menu de  création
+     d'un nouveau tournoi.
+     """
+    def __init__(self):
+        self.view = views.TournamentCreationView()
+
     def __call__(self):
         # 1 générer les inputs
-        elements = get_tournament_elements()
+        elements = self.view.get_tournament_elements()
         # print(elements)
         # 2 instancier un tournoi
         new_tournament = Tournament(*elements)
-        new_tournament.add_handcraft_inputs()
+        new_tournament.add_tournament_inputs()
         # print(new_tournament.tournament)
         # 3 retour au menu général
         return PlayersController()
 
 # Saisie des joueurs
 class PlayersController:
+    """Contrôleur responsable de gérer le menu de  création et de gestion
+     des joueurs.
+     """
+    def __init__(self):
+        self.view = views.PlayersElementsView()
+
     def __call__(self):
-        print("Saisie des joueurs...")
-        # return ???
+        # 1 générer les inputs
+        elements = self.view.get_player_elements()
+        # print(elements)
+        # 2 instancier un joueur
+        new_player = Player(*elements)
+        new_player.add_player_inputs()
+        print(new_player.team_players)
+        # 3 retour au menu général
+        return NewRoundController()
 
 # Saisie des joueurs
 class NewRoundController:

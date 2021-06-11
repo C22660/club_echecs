@@ -1,3 +1,5 @@
+
+
 class HomeMenuView:
 
     def __init__(self, menu):
@@ -25,29 +27,39 @@ class HomeMenuView:
 
 
 # collece des éléments de création du tournoi
-# class TournamentCreationView:
-#
+class TournamentCreationView:
 #     def __init__(self):
-def get_tournament_elements():
-    print("-"*70)
-    print("Pour enregister le tournoi, merci de compléter les champs suivants :")
-    print("-"*70)
-    name = input("Nom du tournoi ? ")
-    place = input("Lieu du tournoi ? ")
-    date = input("date(s) du tournoi ? ")
-    return name, place, date
-
-class PlayersElementsView:
-
-    def creation_team_view(self):
+    def get_tournament_elements(self):
         print("-"*70)
         print("Pour enregister le tournoi, merci de compléter les champs suivants :")
         print("-"*70)
-        name = input("Nom du joueur ? ")
-        first_name = input("Prénom du joueur ? ")
+        name = input("Nom du tournoi ? ")
+        place = input("Lieu du tournoi ? ")
+        date = input("date(s) du tournoi ? ")
+        return name, place, date
+
+class PlayersElementsView:
+
+    def get_player_elements(self):
+        print("-"*70)
+        print("Pour enregister le tournoi, merci de compléter les champs suivants :")
+        print("-"*70)
+        name = input("Nom du joueur ? ").upper()
+        while not name in string.ascii_letters:
+            print("!"*37)
+            print("! Merci de saisir un nom de famille !")
+            print("!" * 37)
+            name = input("Nom du joueur ? ").upper()
+        first_name = input("Prénom du joueur ? ").capitalize()
         birth = input(f"Date de naissance de {first_name} {name} ? ")
-        sex = input(f"Sexe de {first_name} {name} ? ")
+        sex = input(f"Sexe de {first_name} {name} (F ou M) ? ")
         ranking = input(f"Classement de {first_name} {name} ? ")
+        while not ranking.isdigit():
+            print("!"*37)
+            print("! Le classement doit être un nombre !")
+            print("!" * 37)
+            ranking = input(f"Classement de {first_name} {name} ? ")
+
 
         return name, first_name, birth, sex, ranking
 

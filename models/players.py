@@ -17,12 +17,12 @@ class Player:
 
     player_id = 0
     serialized_player = {}
-    team_players = []
 
     def __init__(self, name, first_name, birth, sex, ranking, point='0'):
         # l'incrementation ne fonctionne qui si saisie de tous les joueurs en même temps
         type(self).player_id += 1
         self.player_ID = type(self).player_id
+        self.team_players = []
         self.name = name
         self.first_name = first_name
         self.birth = birth
@@ -33,6 +33,10 @@ class Player:
         # création, lors de l'init, d'une liste des joueurs
         # avec le nombre de point par défaut à 0 pour la première partie
         self.team_players.append(self)
+
+    def add_player_inputs(self):
+        self.team_players.append(["Player-ID "+str(self.player_ID), self.name, self.first_name,
+                                  self.birth, self.sex, self.ranking, self.point])
 
     def generate_first_team(self):
         """Adresse la liste des joueurs à Evens pour création des premières paires de joueurs.
