@@ -17,12 +17,13 @@ class Player:
 
     player_id = 0
     serialized_player = {}
+    team_players = []
 
     def __init__(self, name, first_name, birth, sex, ranking, point='0'):
         # l'incrementation ne fonctionne qui si saisie de tous les joueurs en même temps
         type(self).player_id += 1
         self.player_ID = type(self).player_id
-        self.team_players = []
+        # self.team_players = []
         self.name = name
         self.first_name = first_name
         self.birth = birth
@@ -32,7 +33,7 @@ class Player:
 
         # création, lors de l'init, d'une liste des joueurs
         # avec le nombre de point par défaut à 0 pour la première partie
-        self.team_players.append(self)
+        # self.team_players.append(self)
 
     def add_player_inputs(self):
         self.team_players.append(["Player-ID "+str(self.player_ID), self.name, self.first_name,
@@ -49,8 +50,8 @@ class Player:
         return Evens.sort_players_points(self.team_players)
 
     def __str__(self):
-        return f"le joueur n°{self.player_ID} = {self.name} {self.first_name}, né le {self.birth}, est classé {self.ranking}"
-        # return add_player()
+        # return f"le joueur n°{self.player_ID} = {self.name} {self.first_name}, né le {self.birth}, est classé {self.ranking}"
+        return self.team_players
 
     def generate_even(self):
         """adresse un mix id joueur et rang à la création de pairs"""

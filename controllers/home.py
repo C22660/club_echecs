@@ -4,6 +4,7 @@ from models.players import Player
 # from views.views import HomeMenuView
 # from views.views import get_tournament_elements
 from models.tournaments import Tournament
+from tools.inputs_check import check_names, check_birth_date, check_tournament_date
 
 """les inputs ici"""
 
@@ -95,10 +96,28 @@ class NewTournamentController:
 
     def __call__(self):
         # 1 générer les inputs
-        elements = self.view.get_tournament_elements()
+        # elements = self.view.get_tournament_elements()
+        name = self.view.get_tournament_name()
+        while not check_names(name):
+            print("!"*37)
+            print("! Merci de saisir un nom pour ce tournoi !")
+            print("!" * 37)
+            name = self.view.get_tournament_name()
+        place = self.view.get_tournament_place()
+        while not check_names(place):
+            print("!"*37)
+            print("! Merci de saisir un nom de lieu pour ce tournoi !")
+            print("!" * 37)
+            name = self.view.get_tournament_place()
+        date = self.view.get_tournament_date()
+        while not check_tournament_date(date):
+            print("!"*37)
+            print("! Merci de saisir un nom de lieu pour ce tournoi !")
+            print("!" * 37)
+            name = self.view.get_tournament_place()
         # print(elements)
         # 2 instancier un tournoi
-        new_tournament = Tournament(*elements)
+        new_tournament = Tournament(name, place, date)
         new_tournament.add_tournament_inputs()
         # print(new_tournament.tournament)
         # 3 retour au menu général
@@ -114,11 +133,37 @@ class PlayersController:
 
     def __call__(self):
         # 1 générer les inputs
-        elements = self.view.get_player_elements()
-        # print(elements)
-        # 2 instancier un joueur
-        new_player = Player(*elements)
-        new_player.add_player_inputs()
+        number_of_players = self.view.size_team()
+        counter = 0
+        while counter < int(number_of_players):
+            elements = self.view.get_player_elements()
+            name = self.view.get_player_name()
+            while not check_names(name):
+                print("!" * 37)
+                print("! Merci de saisir un nom de famille !")
+                print("!" * 37)
+                name = self.view.get_player_name()
+            first_name = self.view.get_player_first_name()
+            while not check_names(first_name):
+                print("!" * 29)
+                print("! Merci de saisir un prénom !")
+                print("!" * 29)
+                first_name = self.view.get_player_first_name()
+            birth = self.view.get_player_birth()
+            sex = self.view.get_player_sex()
+            ranking = self.view.get_player_ranking()
+            print(type(ranking))
+            while not ranking.isdigit():
+                print("!" * 37)
+                print("! Le classement doit être un nombre !")
+                print("!" * 37)
+                ranking = self.view.get_player_ranking()
+            # print(elements)
+            # 2 instancier un joueur
+            new_player = Player(name, first_name, birth, sex, ranking)
+            new_player.add_player_inputs()
+            counter += 1
+
         print(new_player.team_players)
         # 3 retour au menu général
         return NewRoundController()

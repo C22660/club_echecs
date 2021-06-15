@@ -1,5 +1,4 @@
 
-
 class HomeMenuView:
 
     def __init__(self, menu):
@@ -38,35 +37,65 @@ class TournamentCreationView:
         date = input("date(s) du tournoi ? ")
         return name, place, date
 
+    def get_tournament_name(self):
+        name = input("Nom du tournoi ? ").upper()
+        return name
+
+    def get_tournament_place(self):
+        place = input("Lieu du tournoi ? ").upper()
+        return place
+
+    def get_tournament_date(self):
+        date = input("date(s) du tournoi ? ")
+        return date
+
 class PlayersElementsView:
+
+    def __init__(self):
+        self.counter = 1
+        self.name = ""
+        self.first_name = ""
+
+    def size_team(self):
+        print("-"*70)
+        print("Combien de joueurs voulez vous enregistrer ?")
+        print("          Nombre pair obligatoire           ")
+        print("-"*70)
+        number = input("Nombre de joueurs : ")
+        return number
 
     def get_player_elements(self):
         print("-"*70)
-        print("Pour enregister le tournoi, merci de compléter les champs suivants :")
+        print(f"Pour enregister le joueur {self.counter}, merci de compléter les champs suivants :")
         print("-"*70)
+        self.counter += 1
+
+    def get_player_name(self):
         name = input("Nom du joueur ? ").upper()
-        while not name in string.ascii_letters:
-            print("!"*37)
-            print("! Merci de saisir un nom de famille !")
-            print("!" * 37)
-            name = input("Nom du joueur ? ").upper()
+        return name
+
+    def get_player_first_name(self):
         first_name = input("Prénom du joueur ? ").capitalize()
-        birth = input(f"Date de naissance de {first_name} {name} ? ")
-        sex = input(f"Sexe de {first_name} {name} (F ou M) ? ")
-        ranking = input(f"Classement de {first_name} {name} ? ")
-        while not ranking.isdigit():
-            print("!"*37)
-            print("! Le classement doit être un nombre !")
-            print("!" * 37)
-            ranking = input(f"Classement de {first_name} {name} ? ")
+        return first_name
 
+    def get_player_birth(self):
+        birth = input(f"Date de naissance de {self.first_name} {self.name} (jj/mm/aaaa) ? ")
+        return birth
 
-        return name, first_name, birth, sex, ranking
+    def get_player_sex(self):
+        sex = input(f"Sexe de {self.first_name} {self.name} (F ou M) ? ")
+        return sex
 
-    def add_player_points_view(self, round_number, first_name, name):
+    def get_player_ranking(self):
+        ranking = input(f"Classement de {self.first_name} {self.name} ? ")
+        return ranking
+
+    def add_player_points_view(self, round_number):
         print("-"*70)
         print("Pour enregister les points du match, merci de compléter le champ suivant :")
         print("-"*70)
         # récupérer les éléments
         print("Round n°"+round_number)
-        point = input(f"Résultats de {first_name} {name} ? ")
+        point = input(f"Résultats de {self.first_name} {self.name} ? ")
+
+
