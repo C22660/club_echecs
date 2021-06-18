@@ -1,4 +1,6 @@
 from operator import attrgetter
+
+from models.data import participants
 """Les pairs correspondent au sytème de répartition des joueurs.
     Ici, elle est basée sur le système Suisse
     à mettre dans les tournois
@@ -10,14 +12,23 @@ ne pas faire l'affectation et demander un joueur de plus"""
 
 class Evens:
 
-    def __init__(self):
+    our_players = []
+
+    def __init__(self, serialization):
+        self.serialization = serialization
         self.team = []
         self.ranking = None
         self.point = None
         self.player_ID = None
 
+    def add_players_evens(self):
+        # ajout du joueur provenant de la class Player
+        self.our_players.append(self.serialization)
+
     def sort_players_ranking(self):
         """Tri premier tour en fonction du rang"""
+        # print(self)
+        # print(type(self))
         our_evens = []
 
         if len(self) % 2 != 0:
@@ -45,3 +56,6 @@ class Evens:
     def make_a_random(self):
         """Tire au sort les couleurs"""
         pass
+
+if __name__ == '__main__':
+    pass

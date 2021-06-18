@@ -1,6 +1,7 @@
 from tools.menus import Menu
 from views import views
 from models.players import Player
+from models.evens import Evens
 # from views.views import HomeMenuView
 # from views.views import get_tournament_elements
 from models.tournaments import Tournament
@@ -13,12 +14,13 @@ class ApplicationController:
     def __init__(self):
         self.controller = None
 
-    def start(self):
+    def start(self, actions=None):
+        actions = (("Créer un tournoi", NewTournamentController()), ("Saisir / modifier la liste des joueurs",
+                                                                     PlayersController()),
+                   ("Démarrer le tournoi", NewRoundController()))
         # au démarrage, on instancie le HomeMenuController
-        # actions = ({"Créer un tournoi" : "NewTournamentController()"}, {"Saisir / modifier la liste des joueurs":
-        #             "PlayersController()"}, {"Démarrer le tournoi": "NewRoundController()"}
-        #             )
         self.controller = HomeMenuController()
+        self.controller.actions_elements = actions
         # tant que sefl.controller n'est pas None (donc while true), l'appli continue de tourner
         while self.controller:
             # si pas __call, self.controller.run()
@@ -30,43 +32,50 @@ class ApplicationController:
 # responsabilité unique)
 
 # Menu d'acceuil, implémente la logique du menu d'accueil
+# class HomeMenuController:
+#     def __init__(self):
+#         # on instancie un menu qui vient des models et donc ajouter un modèle de menu via utils.menu()
+#         # on crée donc un menu et avec le add du call, on lui passe des instructions
+#         self.menu = Menu()
+#         # et on envoi le menu à la vue
+#         self.view = views.HomeMenuView(self.menu)
+#
+#     # au lieu de call, on pourrait faire def run(self):
+#     # la méthode spéciale call permet d'exécuter directement le controller self.controller()
+#     #  au lieu de self.controller.run() puisque self.controller = HomeMenuController()
+#     def __call__(self):
+#         # 1. Construire un menu (video 32'')
+#         # dans ce menu on ajoute certaines entrées et récupérer l'entrée de l'utilisateur
+#         # self.menu.add(key, option, controller associé à cette option)
+#         # la clé pourrait être directement un chiffre, ou une auto numérotation, ou q pour qitter
+#         # en placant () après le controller, cela veut dire qu'on l'instancie directement
+#         self.menu.add("auto", "Créer un tournoi", NewTournamentController())
+#         self.menu.add("auto", "Saisir / modifier la liste des joueurs", PlayersController())
+#         self.menu.add("auto", "Démarrer le tournoi", NewRoundController())
+#         self.menu.add("q", "Quitter", EndScreenController())
+#
+#         # 2. Demander à la vue d'afficher le menu et de collecter la réponse de l'utilisateur (video 50')
+#         user_choice = self.view.get_user_choice()
+#
+#         # 3. Retourner le controller associé au choix de l'utilisateur au contrôleur principal
+#         return user_choice.handler
+
+# class OtherMenuController:
 class HomeMenuController:
-    def __init__(self):
-        # on instancie un menu qui vient des models et donc ajouter un modèle de menu via utils.menu()
-        # on crée donc un menu et avec le add du call, on lui passe des instructions
-        self.menu = Menu()
-        # et on envoi le menu à la vue
-        self.view = views.HomeMenuView(self.menu)
+    actions_elements = []
 
-    # au lieu de call, on pourrait faire def run(self):
-    # la méthode spéciale call permet d'exécuter directement le controller self.controller()
-    #  au lieu de self.controller.run() puisque self.controller = HomeMenuController()
-    def __call__(self):
-        # 1. Construire un menu (video 32'')
-        # dans ce menu on ajoute certaines entrées et récupérer l'entrée de l'utilisateur
-        # self.menu.add(key, option, controller associé à cette option)
-        # la clé pourrait être directement un chiffre, ou une auto numérotation, ou q pour qitter
-        # en placant () après le controller, cela veut dire qu'on l'instancie directement
-        self.menu.add("auto", "Créer un tournoi", NewTournamentController())
-        self.menu.add("auto", "Saisir / modifier la liste des joueurs", PlayersController())
-        self.menu.add("auto", "Démarrer le tournoi", NewRoundController())
-        self.menu.add("q", "Quitter", EndScreenController())
-
-        # 2. Demander à la vue d'afficher le menu et de collecter la réponse de l'utilisateur (video 50')
-        user_choice = self.view.get_user_choice()
-
-        # 3. Retourner le controller associé au choix de l'utilisateur au contrôleur principal
-        return user_choice.handler
-
-class PlayerMenuController:
     def __init__(self):
         self.menu = Menu()
         self.view = views.HomeMenuView(self.menu)
+        self.actions = []
+
+    def add_actions(self, elements):
+        self.actions.append[elements]
 
     def __call__(self):
-        self.menu.add("auto", "Créer un tournoi", NewTournamentController())
-        self.menu.add("auto", "Saisir / modifier la liste des joueurs", PlayersController())
-        self.menu.add("auto", "Démarrer le tournoi", NewRoundController())
+        for sujet in self.actions_elements:
+            self.menu.add("auto", sujet[0], sujet[1])
+
         self.menu.add("q", "Quitter", EndScreenController())
 
         # 2. Demander à la vue d'afficher le menu et de collecter la réponse de l'utilisateur (video 50')
@@ -96,7 +105,7 @@ class NewTournamentController:
 
     def __call__(self):
         # 1 générer les inputs
-        # elements = self.view.get_tournament_elements()
+        tournament = self.view.get_tournament_elements()
         name = self.view.get_tournament_name()
         while not check_names(name):
             print("!"*37)
@@ -115,9 +124,10 @@ class NewTournamentController:
             print("! Merci de saisir un nom de lieu pour ce tournoi !")
             print("!" * 37)
             name = self.view.get_tournament_place()
-        # print(elements)
-        # 2 instancier un tournoi
-        new_tournament = Tournament(name, place, date)
+        time_control = self.view.get_tournament_time()
+        description = self.view.get_trournament_description()
+
+        new_tournament = Tournament(name, place, date, time_control, description)
         new_tournament.add_tournament_inputs()
         # print(new_tournament.tournament)
         # 3 retour au menu général
@@ -134,45 +144,79 @@ class PlayersController:
     def __call__(self):
         # 1 générer les inputs
         number_of_players = self.view.size_team()
-        counter = 0
-        while counter < int(number_of_players):
-            elements = self.view.get_player_elements()
-            name = self.view.get_player_name()
-            while not check_names(name):
-                print("!" * 37)
-                print("! Merci de saisir un nom de famille !")
-                print("!" * 37)
-                name = self.view.get_player_name()
-            first_name = self.view.get_player_first_name()
-            while not check_names(first_name):
-                print("!" * 29)
-                print("! Merci de saisir un prénom !")
-                print("!" * 29)
-                first_name = self.view.get_player_first_name()
-            birth = self.view.get_player_birth()
-            sex = self.view.get_player_sex()
-            ranking = self.view.get_player_ranking()
-            print(type(ranking))
-            while not ranking.isdigit():
-                print("!" * 37)
-                print("! Le classement doit être un nombre !")
-                print("!" * 37)
-                ranking = self.view.get_player_ranking()
-            # print(elements)
+        counter = 1
+        while counter < int(number_of_players)+1:
+            addition = PlayersController.player_addition(self, counter)
             # 2 instancier un joueur
-            new_player = Player(name, first_name, birth, sex, ranking)
-            new_player.add_player_inputs()
+            new_player = Player(*addition)
+            add_data_base = new_player.add_player_inputs()
+            if not add_data_base:
+                print("!" * 36)
+                print("! Joueur déjà présent dans la base !")
+                print("!" * 36)
+                print("")
+                counter -= 1
+            else:
+                players_serialized = new_player.serialization_players()
+                print(f"player serialisé = {type(players_serialized)}")
+            # # ajout des joueurs sérialisés dans la class Evens
+            # preparation_even = Evens(players_serialized)
+            # preparation_even.add_players_evens()
+            # print(f"liste reçue = {type(preparation_even.our_players)}")
             counter += 1
 
-        print(new_player.team_players)
+
+        # new_player.generate_first_team()
+
         # 3 retour au menu général
-        return NewRoundController()
+        return EvensControllers()
+
+    def player_addition(self, counter):
+        """permet de répéter la collecte de l'ensemble des éléments d'un joueur
+        avec, en argument, le numéro du joueur en cours de sa saisie pour que le gestionnaire
+        sache où il en est (n'est pas l'ID joueur)"""
+        self.view = views.PlayersElementsView(counter)
+        self.view.get_player_elements()
+        name = self.view.get_player_name()
+        while not check_names(name):
+            print("!" * 37)
+            print("! Merci de saisir un nom de famille !")
+            print("!" * 37)
+            name = self.view.get_player_name()
+        first_name = self.view.get_player_first_name()
+        while not check_names(first_name):
+            print("!" * 29)
+            print("! Merci de saisir un prénom !")
+            print("!" * 29)
+            first_name = self.view.get_player_first_name()
+        birth = self.view.get_player_birth()
+        sex = self.view.get_player_sex()
+        ranking = self.view.get_player_ranking()
+        print(type(ranking))
+        while not ranking.isdigit():
+            print("!" * 37)
+            print("! Le classement doit être un nombre !")
+            print("!" * 37)
+            ranking = self.view.get_player_ranking()
+        # print(elements)
+        return name, first_name, birth, sex, ranking
+
+class EvensControllers():
+    def __call__(self):
+        pass
+        # # ajout des joueurs sérialisés dans la class Evens
+        # preparation_even = Evens(players_serialized)
+        # preparation_even.add_players_evens()
+        # print(f"liste reçue = {type(preparation_even.our_players)}")
 
 # Saisie des joueurs
 class NewRoundController:
     def __call__(self):
-        print("Lancement des matches")
-        # return ???
+        # actions = (("Afficher la liste des matches", xx()), ("Saisir / modifier la liste des joueurs",
+        #                                                              PlayersController()),
+        #            ("Démarrer le tournoi", NewRoundController()))
+        # # return ???
+        pass
 
 # reprendre une partie encours
 class OngoingGameController:
@@ -190,5 +234,13 @@ class EndScreenController:
 
 
 if __name__ == '__main__':
+    actions = (("Créer un tournoi", NewTournamentController()), ("Saisir / modifier la liste des joueurs",
+                 PlayersController()), ("Démarrer le tournoi", NewRoundController()))
     app = ApplicationController()
     app.start()
+    # app.start(actions)
+    # one_menu = HomeMenuController()
+    # one_menu.__call__()
+    # one_menu.actions_elements = actions
+    # for indice, sujet in enumerate(one_menu.actions_elements):
+    #     print(indice, sujet[1])
