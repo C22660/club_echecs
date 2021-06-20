@@ -15,9 +15,11 @@ class ApplicationController:
         self.controller = None
 
     def start(self, actions=None):
-        actions = (("Créer un tournoi", NewTournamentController()), ("Saisir / modifier la liste des joueurs",
-                                                                     PlayersController()),
-                   ("Démarrer le tournoi", NewRoundController()))
+        actions = (("Créer un tournoi", NewTournamentController()), ("Saisir la liste des joueurs",
+                                                                     PlayersCreationController()),
+                   ("Modifier le rang d'un joueur", ModificationRankingControler()),
+                    ("Démarrer le tournoi", NewRoundController())
+                    )
         # au démarrage, on instancie le HomeMenuController
         self.controller = HomeMenuController()
         self.controller.actions_elements = actions
@@ -50,7 +52,7 @@ class ApplicationController:
 #         # la clé pourrait être directement un chiffre, ou une auto numérotation, ou q pour qitter
 #         # en placant () après le controller, cela veut dire qu'on l'instancie directement
 #         self.menu.add("auto", "Créer un tournoi", NewTournamentController())
-#         self.menu.add("auto", "Saisir / modifier la liste des joueurs", PlayersController())
+#         self.menu.add("auto", "Saisir / modifier la liste des joueurs", PlayersCreationController())
 #         self.menu.add("auto", "Démarrer le tournoi", NewRoundController())
 #         self.menu.add("q", "Quitter", EndScreenController())
 #
@@ -131,10 +133,10 @@ class NewTournamentController:
         new_tournament.add_tournament_inputs()
         # print(new_tournament.tournament)
         # 3 retour au menu général
-        return PlayersController()
+        return PlayersCreationController()
 
 # Saisie des joueurs
-class PlayersController:
+class PlayersCreationController:
     """Contrôleur responsable de gérer le menu de  création et de gestion
      des joueurs.
      """
@@ -146,7 +148,7 @@ class PlayersController:
         number_of_players = self.view.size_team()
         counter = 1
         while counter < int(number_of_players)+1:
-            addition = PlayersController.player_addition(self, counter)
+            addition = PlayersCreationController.player_addition(self, counter)
             # 2 instancier un joueur
             new_player = Player(*addition)
             add_data_base = new_player.add_player_inputs()
@@ -158,6 +160,7 @@ class PlayersController:
                 counter -= 1
             else:
                 players_serialized = new_player.serialization_players()
+                print(players_serialized)
                 print(f"player serialisé = {type(players_serialized)}")
             # # ajout des joueurs sérialisés dans la class Evens
             # preparation_even = Evens(players_serialized)
@@ -199,7 +202,29 @@ class PlayersController:
             print("!" * 37)
             ranking = self.view.get_player_ranking()
         # print(elements)
-        return name, first_name, birth, sex, ranking
+        return name, first_name, birth, ranking, sex
+
+class ModificationRankingControler:
+    """Permet de modifier le rang d'un joueur"""
+    def __init__(self):
+        self.view = views.PlayersElementsView()
+
+    def __call__(self):
+        self.view.get_new_ranking()
+        name = self.view.get_player_name()
+        first_name = self.view.get_player_first_name()
+        birth = self.view.get_player_birth()
+        ranking = self.view.get_player_ranking()
+        player_modified = Player(name, first_name, birth, ranking)
+        check_modification = player_modified.modifie_player_ranking()
+        if check_modification:
+            print("Modification de rang enregistrée")
+        else:
+            print("Joueur non trouvé")
+
+
+        return HomeMenuController()
+
 
 class EvensControllers():
     def __call__(self):
@@ -213,7 +238,7 @@ class EvensControllers():
 class NewRoundController:
     def __call__(self):
         # actions = (("Afficher la liste des matches", xx()), ("Saisir / modifier la liste des joueurs",
-        #                                                              PlayersController()),
+        #                                                              PlayersCreationController()),
         #            ("Démarrer le tournoi", NewRoundController()))
         # # return ???
         pass
@@ -235,7 +260,7 @@ class EndScreenController:
 
 if __name__ == '__main__':
     actions = (("Créer un tournoi", NewTournamentController()), ("Saisir / modifier la liste des joueurs",
-                 PlayersController()), ("Démarrer le tournoi", NewRoundController()))
+                                                                 PlayersCreationController()), ("Démarrer le tournoi", NewRoundController()))
     app = ApplicationController()
     app.start()
     # app.start(actions)

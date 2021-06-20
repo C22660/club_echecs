@@ -22,17 +22,11 @@ class Player:
 
     DB = TinyDB(Path(__file__).resolve().parent / 'db.json', indent=4)
     users = DB.table("Players")
-    DB_content = Query()
+    db_content = Query()
 
-    player_id = 0
-    serialized_player = {}
     team_players = []
 
-    def __init__(self, name, first_name, birth, sex, ranking, point='0'):
-        # l'incrementation permet de créer un ID joueur
-        type(self).player_id += 1
-        self.player_ID = type(self).player_id
-        # self.team_players = []
+    def __init__(self, name, first_name, birth, ranking, sex=None, point='0'):
         self.name = name
         self.first_name = first_name
         self.birth = birth
@@ -47,26 +41,28 @@ class Player:
     def add_player_inputs(self):
         """Verifie si le joueur n'est pas dans la base et sinon, l'ajoute dans la base et la
         liste team player"""
-        # vérification que le joueur n'existe pas dans la base joueur
+        # vérification que le joueur n'existe pas dans la base joueur (avec where et pas query)
         if not Player.users.get((where('name') == self.name) & (where('first_name') == self.first_name) &
                       (where('birth') == self.birth)):
             # ajout dans la liste team_player
-            self.team_players.append(["Player-ID "+str(self.player_ID), self.name, self.first_name,
-                                      self.birth, self.sex, self.ranking, self.point])
-            # ajout dans la base de donnée
-            Player.users.insert({"player ID": "Player-ID "+str(self.player_ID), "name": self.name,
-                                 "first_name": self.first_name, "birth": self.birth, "ranking": self.ranking,
-                                "points": self.point})
+            self.team_players.append([self.name, self.first_name, self.birth, self.sex, self.ranking, self.point])
+            # ajout dans la base de données
+            Player.users.insert({"name": self.name, "first_name": self.first_name, "birth": self.birth,
+                                 "ranking": self.ranking, "points": self.point})
             return True
 
         else:
             return False
 
     def serialization_players(self):
+        # Pour récupérer l'ID du player dans la base après ajout,
+        # on le recherche dans la bse
+        current_add = Player.users.get((where('name') == self.name) & (where('first_name') == self.first_name) &
+                      (where('birth') == self.birth))
         # adresse à evens les données necessaires à la constitution des paires
         team_serialized = {"points": self.point, "ranking": self.ranking,
-                           "player_ID": "Player-ID "+str(self.player_ID)}
-
+                            "player_ID": str(current_add.doc_id)}
+        # return type(current_add)
         return team_serialized
 
     def generate_first_team(self):
@@ -88,40 +84,11 @@ class Player:
         return Evens.sort_players_points(self.team_players)
 
     def __str__(self):
-        # return f"le joueur n°{self.player_ID} = {self.name} {self.first_name}, né le {self.birth}, est classé {self.ranking}"
-        return self.team_players
-
-    def generate_even(self):
-        """adresse un mix id joueur et rang à la création de pairs"""
-
-
-    def add_player(self):
-        Player.player_id +=1
-        serialized_player = {"name": self.name, "first_name": self.first_name, "birth": self.birth,
-        "sex": self.sex, "ranking": self.ranking
-                             }
-        print(serialized_player["ranking"])
-
-        # self.all_players[Player.player_id][serialized_player]
+        return f"le joueur n°{self.player_ID} = {self.name} {self.first_name}, né le {self.birth}, est classé {self.ranking}"
 
     def modifie_player_ranking(self):
-        pass
-
-    def serialized(self):
-        pass
-
-    # def save_players(self):
-    #     chemin = os.path.join(DATA_DIR, "players.json")
-    #     if not os.path.exists(DATA_DIR):
-    #         os.makedirs(DATA_DIR)
-    #
-    #     with open(chemin, "a") as f:
-    #         # json.dump(self.players, f, indent=4)
-    #         json.dump(self.__dict__, f, indent=4)
-    #     # utiliser une class person Encoder(json.JSONEncoder) et json.dump(..., f, cls=personEncoder) ?
-
-
-        # return True
-
+        Player.users.update({"ranking": self.ranking}, (where('name') == self.name) & (where("first_name") == self.first_name)
+                            & (where('birth') == self.birth))
+        return True
 
 

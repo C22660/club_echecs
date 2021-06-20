@@ -78,8 +78,13 @@ class PlayersElementsView:
         print("-"*70)
         # self.counter += 1
 
+    def get_new_ranking(self):
+        print("-"*70)
+        print(f"Pour modisfier le rang d'un joueur, merci de compléter les champs suivants :")
+        print("-"*70)
+
     def get_player_name(self):
-        self.name = input("Nom du joueur ? ").upper()
+        self.name = input("Nom de famille du joueur ? ").upper()
         return self.name
 
     def get_player_first_name(self):
@@ -107,3 +112,10 @@ class PlayersElementsView:
         point = input(f"Résultats de {self.first_name} {self.name} ? ")
 
 
+class PlayersModificationView:
+
+    def __init__(self):
+        self.name = None
+        self.first_name = None
+        self.birth = None
+        self.ranking = None
