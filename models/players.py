@@ -1,8 +1,6 @@
-"""etapes"""
-
 import re
 import string
-from tinydb import TinyDB, Query, where, table
+from tinydb import TinyDB, Query, where
 from pathlib import Path
 
 
@@ -10,7 +8,9 @@ import json
 import os
 # import logging
 
-from models.evens import Evens
+from models.pair import Pair
+from models.pair import Pair
+
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(CUR_DIR, "data")
@@ -18,7 +18,7 @@ DATA_DIR = os.path.join(CUR_DIR, "data")
 # LOGGER = logging.getLogger()
 
 class Player:
-    """Docstring"""
+    """Gère la création des joueurs et leur ajout dans la base"""
 
     DB = TinyDB(Path(__file__).resolve().parent / 'db.json', indent=4)
     users = DB.table("Players")
@@ -26,7 +26,7 @@ class Player:
 
     team_players = []
 
-    def __init__(self, name, first_name, birth, ranking, sex=None, point='0'):
+    def __init__(self, name, first_name, birth, point='0', ranking=None,sex=None):
         self.name = name
         self.first_name = first_name
         self.birth = birth
@@ -76,12 +76,12 @@ class Player:
         # return self.team_players
 
 
-        return Evens.sort_players_ranking(self.team_players)
+        return Pair.sort_players_ranking(self.team_players)
 
     def generate_another_teams(self):
         """Adresse la liste des joueurs à Evens pour création des paires suivantes.
         """
-        return Evens.sort_players_points(self.team_players)
+        return Pair.sort_players_points(self.team_players)
 
     def __str__(self):
         return f"le joueur n°{self.player_ID} = {self.name} {self.first_name}, né le {self.birth}, est classé {self.ranking}"

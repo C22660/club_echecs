@@ -1,10 +1,11 @@
 from tools.menus import Menu
 from views import views
 from models.players import Player
-from models.evens import Evens
+from models.pair import Pair
 # from views.views import HomeMenuView
 # from views.views import get_tournament_elements
 from models.tournaments import Tournament
+from models.rounds import Round
 from tools.inputs_check import check_names, check_birth_date, check_tournament_date
 
 """les inputs ici"""
@@ -17,7 +18,7 @@ class ApplicationController:
     def start(self, actions=None):
         actions = (("Créer un tournoi", NewTournamentController()), ("Saisir la liste des joueurs",
                                                                      PlayersCreationController()),
-                   ("Modifier le rang d'un joueur", ModificationRankingControler()),
+                   ("Modifier le rang d'un joueur", ModificationRankingController()),
                     ("Démarrer le tournoi", NewRoundController())
                     )
         # au démarrage, on instancie le HomeMenuController
@@ -130,9 +131,12 @@ class NewTournamentController:
         description = self.view.get_trournament_description()
 
         new_tournament = Tournament(name, place, date, time_control, description)
-        new_tournament.add_tournament_inputs()
-        # print(new_tournament.tournament)
-        # 3 retour au menu général
+        enregistrement = new_tournament.add_tournament_inputs()
+        if enregistrement:
+            print("Tournoi enregistré")
+        else:
+            print("Tournoi déjà présent dans la base")
+
         return PlayersCreationController()
 
 # Saisie des joueurs
@@ -162,9 +166,10 @@ class PlayersCreationController:
                 players_serialized = new_player.serialization_players()
                 print(players_serialized)
                 print(f"player serialisé = {type(players_serialized)}")
-            # # ajout des joueurs sérialisés dans la class Evens
-            # preparation_even = Evens(players_serialized)
-            # preparation_even.add_players_evens()
+
+                # ajout des joueurs sérialisés dans la class Evens
+                preparation_even = Pair(players_serialized)
+                preparation_even.add_players_pairs()
             # print(f"liste reçue = {type(preparation_even.our_players)}")
             counter += 1
 
@@ -172,12 +177,13 @@ class PlayersCreationController:
         # new_player.generate_first_team()
 
         # 3 retour au menu général
-        return EvensControllers()
+        return FirstRoundController()
 
     def player_addition(self, counter):
         """permet de répéter la collecte de l'ensemble des éléments d'un joueur
         avec, en argument, le numéro du joueur en cours de sa saisie pour que le gestionnaire
-        sache où il en est (n'est pas l'ID joueur)"""
+        sache où il en est (n'est pas l'ID joueur) via counter issu de la class Player"""
+
         self.view = views.PlayersElementsView(counter)
         self.view.get_player_elements()
         name = self.view.get_player_name()
@@ -204,7 +210,7 @@ class PlayersCreationController:
         # print(elements)
         return name, first_name, birth, ranking, sex
 
-class ModificationRankingControler:
+class ModificationRankingController:
     """Permet de modifier le rang d'un joueur"""
     def __init__(self):
         self.view = views.PlayersElementsView()
@@ -226,22 +232,19 @@ class ModificationRankingControler:
         return HomeMenuController()
 
 
-class EvensControllers():
+class FirstRoundController:
     def __call__(self):
-        pass
-        # # ajout des joueurs sérialisés dans la class Evens
-        # preparation_even = Evens(players_serialized)
-        # preparation_even.add_players_evens()
-        # print(f"liste reçue = {type(preparation_even.our_players)}")
 
-# Saisie des joueurs
-class NewRoundController:
-    def __call__(self):
+        """Reprise de  l'ajout des joueurs dans l'attibut de la classe Pair depuis PlayerCreationControler
+         pour créer les pairs du premier match"""
         # actions = (("Afficher la liste des matches", xx()), ("Saisir / modifier la liste des joueurs",
         #                                                              PlayersCreationController()),
         #            ("Démarrer le tournoi", NewRoundController()))
         # # return ???
-        pass
+        first_couples = Pair.sort_players_ranking()
+        new_round = Round(first_couples)
+        new_round.start_round()
+
 
 # reprendre une partie encours
 class OngoingGameController:
