@@ -16,7 +16,7 @@ class Tournament:
     DB = TinyDB(Path(__file__).resolve().parent / 'db.json', indent=4)
     users = DB.table("Tournaments")
 
-    def __init__(self, name, place, date, time_control, description=None):
+    def __init__(self, name, place, date, time_control, description=None, player=[]):
         self.tournament = []
         self.name = name
         self.place = place
@@ -25,6 +25,7 @@ class Tournament:
         self.rounds = []
         self.time_control = time_control
         self.description = description
+        self.players = player
 
     def add_tournament_inputs(self):
         """Verifie si le tournoi n'est pas dans la base et sinon, l'ajoute dans la base et la
@@ -37,9 +38,14 @@ class Tournament:
             # ajout dans la base de données
             Tournament.users.insert({"name": self.name, "place": self.place, "date": self.date,
                                      "Controle de temps": self.time_control, "nombre de round": self.number_of_rounds,
-                                     "description": self.description})
+                                     "description": self.description, "rounds": self.rounds, "players": self.players})
             return True
 
         else:
             return False
         # self.tournament.append([self.name, self.place, self.date])
+
+
+if __name__ == '__main__':
+    tournoi = Tournament("le nom4", "la place4", " la date4", "le time_control4", " la description4")
+    tournoi.add_tournament_inputs()

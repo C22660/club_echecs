@@ -26,13 +26,14 @@ class Player:
 
     team_players = []
 
-    def __init__(self, name, first_name, birth, point='0', ranking=None,sex=None):
+    def __init__(self, name, first_name, birth, point='0', ranking=None, sex=None, id=None):
         self.name = name
         self.first_name = first_name
         self.birth = birth
         self.sex = sex
         self.ranking = ranking
         self.point = point
+        self.id = id
 
         # création, lors de l'init, d'une liste des joueurs
         # avec le nombre de point par défaut à 0 pour la première partie
@@ -47,7 +48,7 @@ class Player:
             # ajout dans la liste team_player
             self.team_players.append([self.name, self.first_name, self.birth, self.sex, self.ranking, self.point])
             # ajout dans la base de données
-            Player.users.insert({"name": self.name, "first_name": self.first_name, "birth": self.birth,
+            Player.users.insert({"name": self.name, "first_name": self.first_name, "birth": self.birth, "sex": self.sex,
                                  "ranking": self.ranking, "points": self.point})
             return True
 
@@ -64,6 +65,14 @@ class Player:
                             "player_ID": str(current_add.doc_id)}
         # return type(current_add)
         return team_serialized
+
+    @classmethod
+    # va chercher les éléments dans la base de donnée à partir de l'ID et les retourne à la class Player
+    def get_by_id(cls, id):
+        data = Player.users.get(doc_id=id)
+        return cls(name=data['name'], first_name=data['first_name'], birth=data['birth'],
+                   ranking=data['ranking'], point=data['points'], id=id)
+
 
     def generate_first_team(self):
         """Adresse la liste des joueurs à Evens pour création des premières paires de joueurs.
@@ -84,11 +93,35 @@ class Player:
         return Pair.sort_players_points(self.team_players)
 
     def __str__(self):
-        return f"le joueur n°{self.player_ID} = {self.name} {self.first_name}, né le {self.birth}, est classé {self.ranking}"
+        return f"le joueur ID {self.id} = {self.name} {self.first_name}, né le {self.birth}, classé {self.ranking}"
 
     def modifie_player_ranking(self):
         Player.users.update({"ranking": self.ranking}, (where('name') == self.name) & (where("first_name") == self.first_name)
                             & (where('birth') == self.birth))
         return True
 
+    def modifie_player_point(self):
+        Player.users.update({"points": self.point}, (where('name') == self.name) & (where("first_name") == self.first_name)
+                            & (where('birth') == self.birth))
+        return True
 
+
+if __name__ == '__main__':
+    def generateur(matches):
+        for players in matches:
+            yield players
+
+
+    matches = [['1', '7'], ['5', '8'], ['4', '3'], ['6', '2']]
+    couple = generateur(matches)
+    print(next(couple))
+    # for id_player in couple:
+    #     # print(id_player)
+    #     player = Player.get_by_id(id=int(id_player))
+    #     print(player)
+    #     print("---")
+
+    # print(vars(player))
+    # une fois la class méthode actionnée, je peux modifier le point
+    # player.point = 1
+    # player.modifie_player_point()
