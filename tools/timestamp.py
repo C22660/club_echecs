@@ -2,7 +2,8 @@ from datetime import datetime
 import locale
 
 
-locale.setlocale(locale.LC_TIME,'')
+locale.setlocale(locale.LC_TIME, '')
+
 
 class TimeStamp:
     """Génère l'horodatage des parties (rounds) sous une forme francisée
@@ -12,8 +13,4 @@ class TimeStamp:
     def time_date_now():
         # renvoi un horodatage à la demande
         now = datetime.now()
-        return now.strftime('le %A %d/%m/%Y à %H:%M:%S')
-
-
-if __name__ == '__main__':
-    TimeStamp.time_date_now()
+        return now.strftime('%A %d/%m/%Y à %H:%M:%S')

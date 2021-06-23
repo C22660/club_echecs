@@ -2,17 +2,15 @@ from tools.timestamp import TimeStamp
 
 """etape 2 Les rounds correspondent au parties jouées (au tours)"""
 
-# instance créé: ronde = Round()
-
 
 class Round:
-    """Création des parties"""
+    """Création d'un round à parti des pairs de joueurs (matches)
 
-    rounds = []
-
-    #rounds: [{'matches': [[0, 1, None]], 'start_datetime': '2021-06-21 12:00:00', 'end_datetime': None}]
+        rendu visuel de round = [{'Round': 1, 'matches': [['1', '7', None], ['5', '8', None], ['4', '3', None],
+        ['6', '2', None]], 'lancement': None, 'fin': None}]"""
 
     def __init__(self, round_number, pairs=None):
+        self.round = []
         self.round_number = round_number
         # liste des correspondances ??
         self.pairs = pairs
@@ -29,40 +27,26 @@ class Round:
         self.end_date_time = TimeStamp.time_date_now()
 
     def creation_new_round(self):
-        self.rounds.append({"Round": self.round_number, "matches": [], "lancement": self.start_date_time,
-                            "fin": self.end_date_time})
+        """ 1 Mise en forme de self.round"""
+        self.round.append({"Round": self.round_number, "matches": [], "lancement": self.start_date_time,
+                           "fin": self.end_date_time})
 
     def add_pairs(self):
-        """On ajoute au couple d'ID représentant le match, un élément qui sera la référence du gagnant
-        ou matche nul"""
+        """ 2 On ajoute aux couples d'ID représentant les matches, un élément qui sera la référence du gagnant
+        ou matche nul. Exemple ['1', '7', None]"""
         matches = []
         for i in self.pairs:
-            # print(i[0], i[1])
             matches.append([i[0], i[1], None])
-        self.rounds[0]["matches"] = matches
-        print(matches)
+        self.round[0]["matches"] = matches
+        return self.round
 
-
-            #Round.rounds[0]["matches"] = (i(0), i(1), None)
-
-    def visu(self):
-        print(self.ranking)
+    def __str__(self):
+        return f"Le round sera : {self.round}."
 
 
 if __name__ == '__main__':
-    # ronde = Round()
-    # ronde.start_round()
-    # ronde.end_round()
-    # ronde.add_round_inputs()
-    # print(ronde.rounds)
-    matches = [['1', '7'], ['5', '8'], ['4', '3'], ['6', '2']]
-    new_round = Round(1, matches)
-    print(new_round.rounds)
-    new_round.add_pairs()
-    print(new_round.rounds)
-    # for i in matches:
-    #     new_round = Round(i)
-    #     print(new_round.rounds)
-        # new_round.start_round()
-        # new_round.add_round_inputs()
-        # print(Round.rounds)
+    les_matches = [['1', '7'], ['5', '8'], ['4', '3'], ['6', '2']]
+    new_round = Round(1, les_matches)
+    ronde = new_round.add_pairs()
+    print(ronde)
+    # print(new_round)
