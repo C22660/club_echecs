@@ -27,8 +27,7 @@ class Player:
         # self.team_players.append(self)
 
     def add_player_inputs(self):
-        """ 1 Verifie si le joueur n'est pas dans la base et sinon, l'ajoute dans la base et la
-        liste team player"""
+        """ 1 Verifie si le joueur n'est pas dans la base et sinon l'joute et si oui, mise à 0 des points"""
         # vérification que le joueur n'existe pas dans la base joueur (avec where et pas query)
         if not Player.users.get((where('name') == self.name) & (where('first_name') == self.first_name) &
                                 (where('birth') == self.birth)):
@@ -40,6 +39,9 @@ class Player:
             return True
 
         else:
+            Player.users.update({"points": self.point}, (where('name') == self.name) & (where("first_name") ==
+                                self.first_name) & (where('birth') == self.birth)
+                                )
             return False
 
     def serialization_players(self):
@@ -48,8 +50,9 @@ class Player:
                                        (where('birth') == self.birth)
                                        )
         # adresse à evens les données necessaires à la constitution des paires
+        self.id = current_add.doc_id
         team_serialized = {"points": self.point, "ranking": self.ranking,
-                           "player_ID": str(current_add.doc_id)
+                           "player_ID": self.id
                            }
         # return type(current_add)
         return team_serialized

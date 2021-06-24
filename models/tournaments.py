@@ -41,7 +41,8 @@ class Tournament:
         """Verifie si le tournoi n'est pas dans la base et sinon, l'ajoute dans la base et la
         liste tournament"""
         # vérification que le tournoi n'existe pas dans la base
-        if not Tournament.users.get((where('name') == self.name) & (where('place') == self.place)):
+        new_tournament = Tournament.users.get((where('name') == self.name) & (where('place') == self.place))
+        if not new_tournament:
             # ajout dans la liste tournament
             self.tournament.append([self.name, self.place, self.date, self.time_control, self.number_of_rounds,
                                     self.time_control, self.description, self.rounds, self.players])
@@ -49,6 +50,10 @@ class Tournament:
             Tournament.users.insert({"name": self.name, "place": self.place, "date": self.date,
                                      "Controle de temps": self.time_control, "nombre de rounds": self.number_of_rounds,
                                      "description": self.description, "rounds": self.rounds, "players": self.players})
+
+            self.id = new_tournament.doc_id
+
+
             return True
 
         else:
@@ -62,29 +67,107 @@ class Tournament:
         return cls(name=data['name'], place=data['place'], date=data['date'], time_control=data['Controle de temps'],
                    description=data['description'], rounds=data['rounds'], players=data['players'], id=id)
 
+    def add_players(self, player):
+        self.players.append(player)
+        Tournament.users.update({"players": self.players}, doc_ids=[self.id])
+        return True
+
     def add_rounds(self, new_round):
         self.rounds.append(new_round)
         Tournament.users.update({"rounds": self.rounds}, doc_ids=[self.id])
         return True
 
-    def start_current_round(self, round_index=None):
-        round_index = len(self.rounds)-1
-        self.rounds[round_index][0]["lancement"] = TimeStamp.time_date_now()
+    def start_current_round(self):
+        current_round_index = len(self.rounds) - 1
+        self.rounds[current_round_index][0]["lancement"] = TimeStamp.time_date_now()
 
     def end_current_round(self):
-        round_index = len(self.rounds) - 1
-        self.rounds[round_index][0]["fin"] = TimeStamp.time_date_now()
+        current_round_index = len(self.rounds) - 1
+        self.rounds[current_round_index][0]["fin"] = TimeStamp.time_date_now()
 
-    def add_score(self, round_index, match_index):
-        """1 si le premier joueur de la liste est gagnant, 2 si c'est le troisième, 3 si match nul"""
-        pass
+    def extract_match_to_add_scores(self):
+        current_round_index = len(self.rounds) - 1
+        matches = self.rounds[current_round_index][0]["matches"]
+        return matches
+
+    def save_scored_matches(self, scored_matches):
+        current_round_index = len(self.rounds) - 1
+        self.rounds[current_round_index][0]["matches"] = scored_matches
+        Tournament.users.update({"rounds": self.rounds}, doc_ids=[self.id])
+
+
+class MatchResults:
+
+    DB = TinyDB(Path(__file__).resolve().parent / 'db.json', indent=4)
+    users = DB.table("Players")
+
+    matches = []
+
+    def __init__(self, matche):
+        self.matche = matche
+        self.player_1_name = None
+        self.player_1_first_name = None
+        self.player_1_id = None
+        self.player_2_name = None
+        self.player_2_first_name = None
+        self.player_2_id = None
+        self.score = 0
+
+    def get_players_by_id(self):
+        """ Permet l'affichage de l'indentité du joueur et non seulement son ID"""
+        self.player_1_id = self.matche[0][0]
+        self.player_2_id = self.matche[0][1]
+        data_1 = MatchResults.users.get(doc_id=int(self.player_1_id))
+        data_2 = MatchResults.users.get(doc_id=int(self.player_2_id))
+        # cls(name=data['name'], first_name=data['first_name'], birth=data['birth'],
+        #     ranking=data['ranking'], point=data['points'], id=id)
+        self.player_1_name = data_1["name"]
+        self.player_1_first_name = data_1["first_name"]
+        self.player_2_name = data_2["name"]
+        self.player_2_first_name = data_2["first_name"]
+
+        return f"{self.player_1_first_name} {self.player_1_name}, ID {self.player_1_id}  <= & => " \
+               f" {self.player_2_first_name} {self.player_2_name}, ID {self.player_2_id}"
+
+
+    def set_winner(self, winner):
+        if winner not in (self.player_1_id, self.player_2_id, 'n', 'N'):
+            return False
+        if winner == self.player_1_id:
+            self.score = (1, 0)
+            # self.players[0].add_win()
+        elif winner == self.player_2_id:
+            self.score = (0, 1)
+            # self.players[1].add_win()
+        else:
+            self.score = (0.5, 0.5)
+            # self.players[0].add_tie()
+            # self.players[1].add_tie()
+
+        self.matche[1] = self.score
+        self.matches.append(self.matche)
+
 
 if __name__ == '__main__':
-    liste = [{'Round': 3, 'matches': [['1', '7', None], ['5', '8', None], ['4', '3', None],
-        ['6', '2', None]], 'lancement': None, 'fin': None}]
-    tournoi = tournament = Tournament.get_by_id(id=1)
+    liste = [{'Round': 3, 'matches': [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None],
+        [('6', '2'), None]], 'lancement': None, 'fin': None}]
+    id_current_tournament = len(Tournament.users)
+    tournoi = Tournament.get_by_id(id=id_current_tournament)
     # print(tournoi.rounds.index)
-    # tournoi.add_rounds(liste)
+    tournoi.add_rounds(liste)
     tournoi.start_current_round()
-
-    print(vars(tournament))
+    # print(vars(tournoi))
+    matches = tournoi.extract_match_to_add_scores()
+    # ---------
+    # # saisie du score
+    # liste = [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None], [('6', '2'), None]]
+    for i in matches:
+        match = MatchResults(i)
+        print(match.get_players_by_id())
+        saisie = input("Saisissez l'ID gagnant ou N pour matche nul : ")
+        print("-"*47)
+        match.set_winner(saisie)
+    results_matches = MatchResults.matches
+    tournoi.save_scored_matches(results_matches)
+    print(tournoi.rounds)
+    # # -------

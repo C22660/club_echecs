@@ -6,8 +6,8 @@ from tools.timestamp import TimeStamp
 class Round:
     """Création d'un round à parti des pairs de joueurs (matches)
 
-        rendu visuel de round = [{'Round': 1, 'matches': [['1', '7', None], ['5', '8', None], ['4', '3', None],
-        ['6', '2', None]], 'lancement': None, 'fin': None}]"""
+        rendu visuel de round = [{'Round': 1, 'matches': [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None],
+        [('6', '2'), None]], 'lancement': None, 'fin': None}]"""
 
     def __init__(self, round_number, pairs=None):
         self.round = []
@@ -32,11 +32,11 @@ class Round:
                            "fin": self.end_date_time})
 
     def add_pairs(self):
-        """ 2 On ajoute aux couples d'ID représentant les matches, un élément qui sera la référence du gagnant
-        ou matche nul. Exemple ['1', '7', None]"""
+        """ 2 On ajoute 1 tuple avec les couples d'ID représentant les matches, un élément qui sera un tuple
+            du résultat du matche. Exemple [('1', '7'), None]"""
         matches = []
         for i in self.pairs:
-            matches.append([i[0], i[1], None])
+            matches.append([(i[0], i[1]), None])
         self.round[0]["matches"] = matches
         return self.round
 

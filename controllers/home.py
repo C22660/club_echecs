@@ -16,10 +16,10 @@ class ApplicationController:
         self.controller = None
 
     def start(self, actions=None):
-        actions = (("Créer un tournoi", NewTournamentController()), ("Saisir la liste des joueurs",
+        actions = (("Créer un tournoi", TournamentCreationController()), ("Saisir la liste des joueurs",
                                                                      PlayersCreationController()),
                    ("Modifier le rang d'un joueur", ModificationRankingController()),
-                    ("Démarrer le tournoi", NewRoundController())
+                    ("Démarrer le tournoi", RoundController())
                     )
         # au démarrage, on instancie le HomeMenuController
         self.controller = HomeMenuController()
@@ -99,7 +99,7 @@ class SignupMenuController:
     pass
 
 # Création d'un nouveau tournoi
-class NewTournamentController:
+class TournamentCreationController:
     """Contrôleur responsable de gérer le menu de  création
      d'un nouveau tournoi.
      """
@@ -133,9 +133,10 @@ class NewTournamentController:
         new_tournament = Tournament(name, place, date, time_control, description)
         enregistrement = new_tournament.add_tournament_inputs()
         if enregistrement:
-            print("Tournoi enregistré")
+            numero = new_tournament.id
+            print(f"Tournoi enregistré sous l'ID {numero}.")
         else:
-            print("Tournoi déjà présent dans la base")
+            print("Tournoi déjà présent dans la base.")
 
         return PlayersCreationController()
 
@@ -167,9 +168,13 @@ class PlayersCreationController:
                 print(players_serialized)
                 print(f"player serialisé = {type(players_serialized)}")
 
-                # ajout des joueurs sérialisés dans la class Evens
+                # ajout du joueur sérialisé dans la class Pair
                 preparation_even = Pair(players_serialized)
                 preparation_even.add_players_pairs()
+                # ajout du joueur dans la class Tournament
+                id_current_tournament = len(Tournament.users)
+                tournoi = Tournament.get_by_id(id=id_current_tournament)
+                tournoi.add_players(new_player.id)
             # print(f"liste reçue = {type(preparation_even.our_players)}")
             counter += 1
 
@@ -177,7 +182,7 @@ class PlayersCreationController:
         # new_player.generate_first_team()
 
         # 3 retour au menu général
-        return FirstRoundController()
+        return RoundController()
 
     def player_addition(self, counter):
         """permet de répéter la collecte de l'ensemble des éléments d'un joueur
@@ -232,7 +237,7 @@ class ModificationRankingController:
         return HomeMenuController()
 
 
-class FirstRoundController:
+class RoundController:
     def __call__(self):
 
         """Reprise de  l'ajout des joueurs dans l'attibut de la classe Pair depuis PlayerCreationControler
@@ -241,10 +246,20 @@ class FirstRoundController:
         #                                                              PlayersCreationController()),
         #            ("Démarrer le tournoi", NewRoundController()))
         # # return ???
-        first_couples = Pair.sort_players_ranking()
-        new_round = Round(first_couples)
-        new_round.start_round()
+        couples = Pair.sort_players_ranking()
 
+        new_round = Round(1, couples)
+        ronde = new_round.add_pairs()
+        start_tournament = Tournament.get_by_id(ronde, id=0)
+
+
+    def generateur(matches):
+        for players in matches:
+            yield players
+
+    matches = [['1', '7'], ['5', '8'], ['4', '3'], ['6', '2']]
+    couple = generateur(matches)
+    print(next(couple))
 
 # reprendre une partie encours
 class OngoingGameController:
@@ -262,8 +277,8 @@ class EndScreenController:
 
 
 if __name__ == '__main__':
-    actions = (("Créer un tournoi", NewTournamentController()), ("Saisir / modifier la liste des joueurs",
-                                                                 PlayersCreationController()), ("Démarrer le tournoi", NewRoundController()))
+    # actions = (("Créer un tournoi", NewTournamentController()), ("Saisir / modifier la liste des joueurs",
+    #                                                              PlayersCreationController()), ("Démarrer le tournoi", NewRoundController()))
     app = ApplicationController()
     app.start()
     # app.start(actions)
