@@ -12,7 +12,8 @@ ne pas faire l'affectation et demander un joueur de plus"""
 
 class Pair:
 
-    our_players = [{'points': '0', 'ranking': '2100', 'player_ID': '1'}, {'points': '0', 'ranking': '1200', 'player_ID': '2'}, {'points': '0', 'ranking': '1600', 'player_ID': '3'}, {'points': '0', 'ranking': '1800', 'player_ID': '4'}, {'points': '0', 'ranking': '1900', 'player_ID': '5'}, {'points': '0', 'ranking': '1720', 'player_ID': '6'}, {'points': '0', 'ranking': '1700', 'player_ID': '7'}, {'points': '0', 'ranking': '1680', 'player_ID': '8'}]
+    # our_players = [{'points': '0', 'ranking': '2100', 'player_ID': '1'}, {'points': '0', 'ranking': '1200', 'player_ID': '2'}, {'points': '0', 'ranking': '1600', 'player_ID': '3'}, {'points': '0', 'ranking': '1800', 'player_ID': '4'}, {'points': '0', 'ranking': '1900', 'player_ID': '5'}, {'points': '0', 'ranking': '1720', 'player_ID': '6'}, {'points': '0', 'ranking': '1700', 'player_ID': '7'}, {'points': '0', 'ranking': '1680', 'player_ID': '8'}]
+    our_players = []
 
     def __init__(self, serialization=None):
         self.serialization = serialization
@@ -28,6 +29,7 @@ class Pair:
     def sort_players_ranking(self):
         """Tri premier tour en fonction du rang"""
         our_evens = []
+        our_evens_with_name = []
 
         # tri selon le rang
         liste_trie = sorted(self.our_players, key=lambda k: k['ranking'], reverse=True)
@@ -36,8 +38,11 @@ class Pair:
         # de chaques listes (basée sur la longeur de la liste au lieu d'un index fixe)
         for first_player, second_player in zip(liste_trie, liste_trie[len(liste_trie) // 2:]):
             our_evens.append([first_player["player_ID"], second_player["player_ID"]])
+            our_evens_with_name.append([(first_player["player_ID"], first_player["name"], first_player["first_name"]),
+                                        (second_player["player_ID"], second_player["name"], second_player["first_name"])
+                                        ])
 
-        return our_evens
+        return our_evens, our_evens_with_name
 
     def sort_players_points(self):
         """Tri tours suivants en fonction des points et, si égalité, du rang"""
@@ -48,10 +53,10 @@ class Pair:
 
         return our_evens
 
-    def make_a_random(self):
-        """Tire au sort les couleurs"""
-        pass
 
 if __name__ == '__main__':
-    pair = Pair()
-    print(pair.sort_players_ranking())
+    serie = our_players = [{'points': '0', 'ranking': '2100', 'player_ID': '1'}, {'points': '0', 'ranking': '1200', 'player_ID': '2'}, {'points': '0', 'ranking': '1600', 'player_ID': '3'}, {'points': '0', 'ranking': '1800', 'player_ID': '4'}, {'points': '0', 'ranking': '1900', 'player_ID': '5'}, {'points': '0', 'ranking': '1720', 'player_ID': '6'}, {'points': '0', 'ranking': '1700', 'player_ID': '7'}, {'points': '0', 'ranking': '1680', 'player_ID': '8'}]
+    for i in serie:
+        pair = Pair(i)
+        pair.add_players_pairs()
+        print(pair.sort_players_ranking())

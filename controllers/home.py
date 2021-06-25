@@ -1,25 +1,28 @@
 from tools.menus import Menu
 from views import views
 from models.players import Player
-from models.pair import Pair
+from models.pairs import Pair
 # from views.views import HomeMenuView
 # from views.views import get_tournament_elements
 from models.tournaments import Tournament
 from models.rounds import Round
+from models.matches import MatchResults
 from tools.inputs_check import check_names, check_birth_date, check_tournament_date
 
 """les inputs ici"""
 
 # 1 AppliationController est le chef d'orchestre
+
+
 class ApplicationController:
     def __init__(self):
         self.controller = None
 
-    def start(self, actions=None):
+    def start(self):
         actions = (("Créer un tournoi", TournamentCreationController()), ("Saisir la liste des joueurs",
-                                                                     PlayersCreationController()),
+                   PlayersCreationController()),
                    ("Modifier le rang d'un joueur", ModificationRankingController()),
-                    ("Démarrer le tournoi", RoundController())
+                   ("Démarrer le tournoi", RoundController())
                     )
         # au démarrage, on instancie le HomeMenuController
         self.controller = HomeMenuController()
@@ -72,8 +75,8 @@ class HomeMenuController:
         self.view = views.HomeMenuView(self.menu)
         self.actions = []
 
-    def add_actions(self, elements):
-        self.actions.append[elements]
+    # def add_actions(self, elements):
+    #     self.actions.append[elements]
 
     def __call__(self):
         for sujet in self.actions_elements:
@@ -134,9 +137,13 @@ class TournamentCreationController:
         enregistrement = new_tournament.add_tournament_inputs()
         if enregistrement:
             numero = new_tournament.id
-            print(f"Tournoi enregistré sous l'ID {numero}.")
+            print('"'*45)
+            print(f"----INFO----> Tournoi enregistré sous l'ID {numero}.")
+            print('"' * 45)
         else:
-            print("Tournoi déjà présent dans la base.")
+            print('"' * 45)
+            print("----INFO----> Tournoi déjà présent dans la base.")
+            print('"' * 45)
 
         return PlayersCreationController()
 
@@ -149,7 +156,7 @@ class PlayersCreationController:
         self.view = views.PlayersElementsView()
 
     def __call__(self):
-        # 1 générer les inputs
+        # 1 générer les inputs concernant les joueurs
         number_of_players = self.view.size_team()
         counter = 1
         while counter < int(number_of_players)+1:
@@ -165,21 +172,74 @@ class PlayersCreationController:
                 counter -= 1
             else:
                 players_serialized = new_player.serialization_players()
-                print(players_serialized)
-                print(f"player serialisé = {type(players_serialized)}")
 
-                # ajout du joueur sérialisé dans la class Pair
+                # 3 ajout du joueur sérialisé dans la class Pair
                 preparation_even = Pair(players_serialized)
                 preparation_even.add_players_pairs()
-                # ajout du joueur dans la class Tournament
+
+                # 4 ajout du joueur dans la class Tournament
                 id_current_tournament = len(Tournament.users)
                 tournoi = Tournament.get_by_id(id=id_current_tournament)
                 tournoi.add_players(new_player.id)
             # print(f"liste reçue = {type(preparation_even.our_players)}")
             counter += 1
 
+        # 5 Une fois les paires effectuées, affichage à l'écran
+        our_pairs = preparation_even.sort_players_ranking()
+        print("*"*30)
+        print(" Les paires de joueurs sont : ")
+        # passer par la view car résultat :(12, 'MOUIL', 'Jule') <---&---> (11, 'POLIU', 'Lucienne')
+        for couple in our_pairs[1]:
+            print(couple)
+            print(f'{couple[0]} <---&---> {couple[1]}')
 
-        # new_player.generate_first_team()
+        # 6 passage de ces paires à la class Round
+        les_matches = [['1', '7'], ['5', '8'], ['4', '3'], ['6', '2']]
+        new_round = Round(1, our_pairs[0])
+
+        # 7 on récupère les rondes sous la bonne mise en forme, et on l'adresse à Tournament
+        # la class Tournament est "réveillée" par la @classmethode et récupère les infos contenues dans sa base
+        rondes = new_round.add_pairs()
+        id_current_tournament = len(Tournament.users)
+        tournoi = Tournament.get_by_id(id=id_current_tournament)
+        tournoi.add_rounds(rondes)
+        # 8 on démarre les matches et donc on ajoute l'heure et la date de démarrage
+        lancement = input("Quans vous souhaitez lancer les matches, saisissez G (comme Go) : ")
+        if lancement in ("g", "G"):
+            tournoi.start_current_round()
+        else:
+            print("Erreur de commande")
+            return lancement
+        print("")
+        print("------> JEU EN COURS")
+        print("")
+        # 10 on arrête le jeux quand les matches sont terminés
+        stop = input("Quans vous souhaitez arrêter les matches, saisissez S (comme Stop) : ")
+        if stop in ("s", "S"):
+            tournoi.end_current_round()
+        else:
+            print("Erreur de commande")
+            return stop
+        print("")
+        print("------> JEU TERMINÉ")
+        print("")
+        # 10 on récupre dans le round de la base tournoi, la partie relative au matches
+        matches = tournoi.extract_match_to_add_scores()
+        # 11 Le gestionnaire va saisir les scores
+        print('"'*50)
+        print("Vous allez procéder à la saisie des résultats")
+        for i in matches:
+            match = MatchResults(i)
+            print(match.get_players_by_id())
+            saisie = input("Saisissez l'ID gagnant ou N pour matche nul : ")
+            print("-" * 47)
+            if match.set_winner(saisie):
+                pass
+            else:
+                return saisie
+        results_matches = MatchResults.matches
+        tournoi.save_scored_matches(results_matches)
+        print(tournoi.rounds)
 
         # 3 retour au menu général
         return RoundController()
@@ -206,13 +266,11 @@ class PlayersCreationController:
         birth = self.view.get_player_birth()
         sex = self.view.get_player_sex()
         ranking = self.view.get_player_ranking()
-        print(type(ranking))
         while not ranking.isdigit():
             print("!" * 37)
             print("! Le classement doit être un nombre !")
             print("!" * 37)
             ranking = self.view.get_player_ranking()
-        # print(elements)
         return name, first_name, birth, ranking, sex
 
 class ModificationRankingController:
@@ -239,27 +297,27 @@ class ModificationRankingController:
 
 class RoundController:
     def __call__(self):
-
+        print("coté round controler")
         """Reprise de  l'ajout des joueurs dans l'attibut de la classe Pair depuis PlayerCreationControler
          pour créer les pairs du premier match"""
         # actions = (("Afficher la liste des matches", xx()), ("Saisir / modifier la liste des joueurs",
         #                                                              PlayersCreationController()),
         #            ("Démarrer le tournoi", NewRoundController()))
         # # return ???
-        couples = Pair.sort_players_ranking()
+        # couples = Pair.our_players
+        # print(couples)
+        # new_round = Round(1, couples)
+        # ronde = new_round.add_pairs()
+        # start_tournament = Tournament.get_by_id(ronde, id=0)
 
-        new_round = Round(1, couples)
-        ronde = new_round.add_pairs()
-        start_tournament = Tournament.get_by_id(ronde, id=0)
 
-
-    def generateur(matches):
-        for players in matches:
-            yield players
-
-    matches = [['1', '7'], ['5', '8'], ['4', '3'], ['6', '2']]
-    couple = generateur(matches)
-    print(next(couple))
+    # def generateur(matches):
+    #     for players in matches:
+    #         yield players
+    #
+    # matches = [['1', '7'], ['5', '8'], ['4', '3'], ['6', '2']]
+    # couple = generateur(matches)
+    # print(next(couple))
 
 # reprendre une partie encours
 class OngoingGameController:

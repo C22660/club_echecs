@@ -1,7 +1,7 @@
 from tinydb import TinyDB, Query, where
 from pathlib import Path
 
-from models.pair import Pair
+from models.pairs import Pair
 
 
 class Player:
@@ -52,7 +52,7 @@ class Player:
         # adresse à evens les données necessaires à la constitution des paires
         self.id = current_add.doc_id
         team_serialized = {"points": self.point, "ranking": self.ranking,
-                           "player_ID": self.id
+                           "player_ID": self.id, "name": self.name, "first_name": self.first_name
                            }
         # return type(current_add)
         return team_serialized
