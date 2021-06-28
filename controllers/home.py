@@ -22,7 +22,7 @@ class ApplicationController:
         actions = (("Créer un tournoi", TournamentCreationController()), ("Saisir la liste des joueurs",
                    PlayersCreationController()),
                    ("Modifier le rang d'un joueur", ModificationRankingController()),
-                   ("Démarrer le tournoi", RoundController())
+                   ("Autres rounds", OtherRoundsController())
                     )
         # au démarrage, on instancie le HomeMenuController
         self.controller = HomeMenuController()
@@ -114,21 +114,21 @@ class TournamentCreationController:
         tournament = self.view.get_tournament_elements()
         name = self.view.get_tournament_name()
         while not check_names(name):
-            print("!"*37)
-            print("! Merci de saisir un nom pour ce tournoi !")
-            print("!" * 37)
+            print("!"*70)
+            print("!               Merci de saisir un nom pour ce tournoi               !")
+            print("!" * 70)
             name = self.view.get_tournament_name()
         place = self.view.get_tournament_place()
         while not check_names(place):
-            print("!"*37)
-            print("! Merci de saisir un nom de lieu pour ce tournoi !")
-            print("!" * 37)
+            print("!"*70)
+            print("!           Merci de saisir un nom de lieu pour ce tournoi           !")
+            print("!" * 70)
             name = self.view.get_tournament_place()
         date = self.view.get_tournament_date()
         while not check_tournament_date(date):
-            print("!"*37)
-            print("! Merci de saisir un nom de lieu pour ce tournoi !")
-            print("!" * 37)
+            print("!"*70)
+            print("!           Merci de saisir un nom de lieu pour ce tournoi           !")
+            print("!" * 70)
             name = self.view.get_tournament_place()
         time_control = self.view.get_tournament_time()
         description = self.view.get_trournament_description()
@@ -137,13 +137,13 @@ class TournamentCreationController:
         enregistrement = new_tournament.add_tournament_inputs()
         if enregistrement:
             numero = new_tournament.id
-            print('"'*45)
-            print(f"----INFO----> Tournoi enregistré sous l'ID {numero}.")
-            print('"' * 45)
+            print('"'*70)
+            print(f"         ------INFO-----> Tournoi enregistré sous l'ID {numero}.           ")
+            print('"' * 70)
         else:
-            print('"' * 45)
-            print("----INFO----> Tournoi déjà présent dans la base.")
-            print('"' * 45)
+            print('"' * 70)
+            print("         ------INFO-----> Tournoi déjà présent dans la base.        ")
+            print('"' * 70)
 
         return PlayersCreationController()
 
@@ -165,9 +165,9 @@ class PlayersCreationController:
             new_player = Player(*addition)
             add_data_base = new_player.add_player_inputs()
             if not add_data_base:
-                print("!" * 36)
-                print("! Joueur déjà présent dans la base !")
-                print("!" * 36)
+                print('"' * 70)
+                print('"         ------INFO-----> Joueur déjà présent dans la base.          ')
+                print('"' * 70)
                 print("")
                 counter -= 1
             else:
@@ -186,15 +186,13 @@ class PlayersCreationController:
 
         # 5 Une fois les paires effectuées, affichage à l'écran
         our_pairs = preparation_even.sort_players_ranking()
-        print("*"*30)
+        print("*"*70)
         print(" Les paires de joueurs sont : ")
         # passer par la view car résultat :(12, 'MOUIL', 'Jule') <---&---> (11, 'POLIU', 'Lucienne')
         for couple in our_pairs[1]:
-            print(couple)
             print(f'{couple[0]} <---&---> {couple[1]}')
 
         # 6 passage de ces paires à la class Round
-        les_matches = [['1', '7'], ['5', '8'], ['4', '3'], ['6', '2']]
         new_round = Round(1, our_pairs[0])
 
         # 7 on récupère les rondes sous la bonne mise en forme, et on l'adresse à Tournament
@@ -203,46 +201,8 @@ class PlayersCreationController:
         id_current_tournament = len(Tournament.users)
         tournoi = Tournament.get_by_id(id=id_current_tournament)
         tournoi.add_rounds(rondes)
-        # 8 on démarre les matches et donc on ajoute l'heure et la date de démarrage
-        lancement = input("Quans vous souhaitez lancer les matches, saisissez G (comme Go) : ")
-        if lancement in ("g", "G"):
-            tournoi.start_current_round()
-        else:
-            print("Erreur de commande")
-            return lancement
-        print("")
-        print("------> JEU EN COURS")
-        print("")
-        # 10 on arrête le jeux quand les matches sont terminés
-        stop = input("Quans vous souhaitez arrêter les matches, saisissez S (comme Stop) : ")
-        if stop in ("s", "S"):
-            tournoi.end_current_round()
-        else:
-            print("Erreur de commande")
-            return stop
-        print("")
-        print("------> JEU TERMINÉ")
-        print("")
-        # 10 on récupre dans le round de la base tournoi, la partie relative au matches
-        matches = tournoi.extract_match_to_add_scores()
-        # 11 Le gestionnaire va saisir les scores
-        print('"'*50)
-        print("Vous allez procéder à la saisie des résultats")
-        for i in matches:
-            match = MatchResults(i)
-            print(match.get_players_by_id())
-            saisie = input("Saisissez l'ID gagnant ou N pour matche nul : ")
-            print("-" * 47)
-            if match.set_winner(saisie):
-                pass
-            else:
-                return saisie
-        results_matches = MatchResults.matches
-        tournoi.save_scored_matches(results_matches)
-        print(tournoi.rounds)
 
-        # 3 retour au menu général
-        return RoundController()
+        return MatchesController()
 
     def player_addition(self, counter):
         """permet de répéter la collecte de l'ensemble des éléments d'un joueur
@@ -273,6 +233,71 @@ class PlayersCreationController:
             ranking = self.view.get_player_ranking()
         return name, first_name, birth, ranking, sex
 
+class MatchesController:
+    """Contrôle le lancement et l'arrêt des macthes, gère l'ajout des résultats et leurs sauvegardes dans la base
+        du tournoi en cours (round correspondant)
+         """
+
+    # def __init__(self):
+    #     self.view = views.PlayersElementsView()
+
+    def __call__(self):
+
+        # la class Tournament est "réveillée" par la @classmethode et récupère les infos contenues dans sa base
+        id_current_tournament = len(Tournament.users)
+        tournoi = Tournament.get_by_id(id=id_current_tournament)
+        # on démarre les matches et donc on ajoute l'heure et la date de démarrage
+        lancement = input("Quand vous souhaitez lancer les matches, saisissez G (comme Go) : ")
+        while lancement not in ("g", "G"):
+            print("Erreur de commande.")
+            input(lancement)
+        else:
+            tournoi.start_current_round()
+        print("-"*70)
+        print("------> JEU EN COURS                                                ")
+        print("-"*70)
+        # 10 on arrête le jeux quand les matches sont terminés
+        stop = input("Quans vous souhaitez arrêter les matches, saisissez S (comme Stop) : ")
+        if stop in ("s", "S"):
+            tournoi.end_current_round()
+        else:
+            print("Erreur de commande")
+            return stop
+        print("")
+        print("------> JEU TERMINÉ")
+        print("")
+        # on récupère dans le round de la base tournoi, la partie relative au matches
+        matches = tournoi.extract_match_to_add_scores()
+        print("matches = tournoi.extract_match_to_add_scores()")
+        print(matches)
+        # Le gestionnaire va saisir les scores
+        print('"'*50)
+        print("Vous allez procéder à la saisie des résultats")
+        for i in matches[0]:
+            match = MatchResults(i)
+            print(match.get_players_by_id())
+            saisie = input("Saisissez l'ID gagnant ou N pour matche nul : ")
+            print(type(saisie))
+            print("-" * 47)
+            # match.check_input_winner()
+            match.set_winner(saisie)
+            print(match.player_1_id, match.player_2_id)
+            print("type self id")
+            print(type(match.player_1_id))
+        results_matches = MatchResults.matches
+        print("ds home results_matches")
+        print(results_matches)
+        tournoi.save_scored_matches(results_matches)
+        # print(tournoi.rounds)
+        # if match.set_winner(saisie):
+        #     pass
+        # else:
+        #     return saisie
+        # 3 retour au menu général
+        return HomeMenuController()
+
+
+
 class ModificationRankingController:
     """Permet de modifier le rang d'un joueur"""
     def __init__(self):
@@ -295,31 +320,57 @@ class ModificationRankingController:
         return HomeMenuController()
 
 
-class RoundController:
+class OtherRoundsController:
+    """une fois les premiers matches réalisés, collecte la synthèse des matches depuis la base tournoi
+        et met à jour les scores dans la class joueurs pour générer de nouvelles paires, puis un nouveau round."""
     def __call__(self):
-        print("coté round controler")
-        """Reprise de  l'ajout des joueurs dans l'attibut de la classe Pair depuis PlayerCreationControler
-         pour créer les pairs du premier match"""
-        # actions = (("Afficher la liste des matches", xx()), ("Saisir / modifier la liste des joueurs",
-        #                                                              PlayersCreationController()),
-        #            ("Démarrer le tournoi", NewRoundController()))
-        # # return ???
-        # couples = Pair.our_players
-        # print(couples)
-        # new_round = Round(1, couples)
-        # ronde = new_round.add_pairs()
-        # start_tournament = Tournament.get_by_id(ronde, id=0)
+        id_current_tournament = len(Tournament.users)
+        tournoi = Tournament.get_by_id(id=id_current_tournament)
+        result = tournoi.extract_match_to_add_scores()
+        # result comprend une liste des matches et le numéro du round
+        matches = result[0]
+        round_number = result[1]
+        for element in matches:
+            id_first_player = element[0][0]
+            score_first_player = element[1][0]
+            player = Player.get_by_id(id=id_first_player)
+            player.modifie_player_point(score_first_player)
+            player_serialized = player.serialization_players()
+            # ajout du joueur sérialisé dans la class Pair
+            preparation_even = Pair(player_serialized)
+            preparation_even.add_players_pairs()
+        for element in matches:
+            id_second_player = element[0][1]
+            score_second_player = element[1][1]
+            player = Player.get_by_id(id=id_second_player)
+            player.modifie_player_point(score_second_player)
+            player_serialized = player.serialization_players()
+            # ajout du joueur sérialisé dans la class Pair
+            preparation_even = Pair(player_serialized)
+            preparation_even.add_players_pairs()
+
+        # Une fois les paires effectuées (avec les points puis rangs si nécessaire, affichage à l'écran
+        our_pairs = preparation_even.sort_players_points()
+        print("*" * 70)
+        print(" Les paires de joueurs sont : ")
+        for couple in our_pairs[1]:
+            print(f'{couple[0]} <---&---> {couple[1]}')
+
+        # passage de ces paires à la class Round
+        new_round = Round(round_number+1, our_pairs[0])
+
+        # on récupère les rondes sous la bonne mise en forme, et on l'adresse à Tournament
+        # la class Tournament est "réveillée" par la @classmethode et récupère les infos contenues dans sa base
+        rondes = new_round.add_pairs()
+        id_current_tournament = len(Tournament.users)
+        tournoi = Tournament.get_by_id(id=id_current_tournament)
+        tournoi.add_rounds(rondes)
+
+        return MatchesController()
 
 
-    # def generateur(matches):
-    #     for players in matches:
-    #         yield players
-    #
-    # matches = [['1', '7'], ['5', '8'], ['4', '3'], ['6', '2']]
-    # couple = generateur(matches)
-    # print(next(couple))
 
-# reprendre une partie encours
+
 class OngoingGameController:
     pass
 

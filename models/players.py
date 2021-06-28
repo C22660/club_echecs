@@ -13,7 +13,7 @@ class Player:
 
     team_players = []
 
-    def __init__(self, name, first_name, birth, point='0', ranking=None, sex=None, id=None):
+    def __init__(self, name=None, first_name=None, birth=None, ranking=None, sex=None, point='0', id=None):
         self.name = name
         self.first_name = first_name
         self.birth = birth
@@ -92,7 +92,8 @@ class Player:
                             self.first_name) & (where('birth') == self.birth))
         return True
 
-    def modifie_player_point(self):
+    def modifie_player_point(self, point):
+        self.point = point
         Player.users.update({"points": self.point}, (where('name') == self.name) & (where("first_name") ==
                             self.first_name) & (where('birth') == self.birth)
                             )

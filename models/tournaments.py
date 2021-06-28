@@ -91,7 +91,8 @@ class Tournament:
     def extract_match_to_add_scores(self):
         current_round_index = len(self.rounds) - 1
         matches = self.rounds[current_round_index][0]["matches"]
-        return matches
+        round_number = self.rounds[current_round_index][0]["Round"]
+        return matches, round_number
 
     def save_scored_matches(self, scored_matches):
         current_round_index = len(self.rounds) - 1
@@ -100,27 +101,41 @@ class Tournament:
 
 
 if __name__ == '__main__':
-    liste = [{'Round': 3, 'matches': [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None],
-        [('6', '2'), None]], 'lancement': None, 'fin': None}]
+
+    # # 1 liste = [{'Round': 3, 'matches': [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None],
+    #     [('6', '2'), None]], 'lancement': None, 'fin': None}]
+    # id_current_tournament = len(Tournament.users)
+    # tournoi = Tournament.get_by_id(id=id_current_tournament)
+    # # print(tournoi.rounds.index)
+    # tournoi.add_rounds(liste)
+    # tournoi.start_current_round()
+    # # print(vars(tournoi))
+    # matches = tournoi.extract_match_to_add_scores()
+    # # ---------
+    # # # 2 saisie du score
+    # # liste = [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None], [('6', '2'), None]]
+    # # for i in matches:
+    # #     match = MatchResults(i)
+    # #     print(match.get_players_by_id())
+    # #     saisie = input("Saisissez l'ID gagnant ou N pour matche nul : ")
+    # #     print("-"*47)
+    # #     match.set_winner(saisie)
+    # # results_matches = MatchResults.matches
+    # # results_matches = [[('1', '7'), (1, 0)], [('5', '8'), (0, 1)], [('4', '3'), (0.5, 0.5)], [('6', '2'), (1, 0)]]
+    # results_matches = [[('1', '7'), (1, 0)], [('5', '8'), (0, 1)], [('4', '3'), (0.5, 0.5)], [('6', '2'), (1, 0)]]
+    # tournoi.save_scored_matches(results_matches)
+    # print(tournoi.rounds)
+    # # # # -------
     id_current_tournament = len(Tournament.users)
     tournoi = Tournament.get_by_id(id=id_current_tournament)
-    # print(tournoi.rounds.index)
-    tournoi.add_rounds(liste)
-    tournoi.start_current_round()
-    # print(vars(tournoi))
     matches = tournoi.extract_match_to_add_scores()
-    # ---------
-    # # saisie du score
-    # liste = [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None], [('6', '2'), None]]
-    # for i in matches:
-    #     match = MatchResults(i)
-    #     print(match.get_players_by_id())
-    #     saisie = input("Saisissez l'ID gagnant ou N pour matche nul : ")
-    #     print("-"*47)
-    #     match.set_winner(saisie)
-    # results_matches = MatchResults.matches
-    # results_matches = [[('1', '7'), (1, 0)], [('4', '3'), (1, 0)], [('6', '2'), (0, 1)]]
-    results_matches = ["test resul"]
-    tournoi.save_scored_matches(results_matches)
-    print(tournoi.rounds)
-    # # # -------
+    print(matches)
+    for element in matches:
+        id_first_player = element[0][0]
+        score_first_player = element[1][0]
+        print("joueur", id_first_player, "score", score_first_player)
+    print("second")
+    for element in matches:
+        id_second_player = element[0][1]
+        score_second_player = element[1][1]
+        print("joueur", id_second_player, "score", score_second_player)

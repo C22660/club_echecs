@@ -46,12 +46,24 @@ class Pair:
 
     def sort_players_points(self):
         """Tri tours suivants en fonction des points et, si égalité, du rang"""
+        our_evens = []
+        our_evens_with_name = []
 
-        # Solution source docs python, Guide pour le tri, Stabilité des tris et tris complexes
-        s = sorted(self, key=attrgetter("ranking"), reverse=True)
-        our_evens = sorted(s, key=attrgetter("point"), reverse=True)
+        # # Solution source docs python, Guide pour le tri, Stabilité des tris et tris complexes
+        # s = sorted(self, key=attrgetter("ranking"), reverse=True)
+        # liste_trie = sorted(s, key=attrgetter("point"), reverse=True)
+        s = sorted(self.our_players, key=lambda k: k['ranking'], reverse=True)
+        liste_trie = sorted(s, key=lambda k: k['points'], reverse=True)
 
-        return our_evens
+        # utilisation de zip pour partager la liste en deux et affecter les joueurs dans l'ordre
+        # de chaques listes (basée sur la longeur de la liste au lieu d'un index fixe)
+        for first_player, second_player in zip(liste_trie, liste_trie[len(liste_trie) // 2:]):
+            our_evens.append([first_player["player_ID"], second_player["player_ID"]])
+            our_evens_with_name.append([(first_player["player_ID"], first_player["name"], first_player["first_name"]),
+                                        (second_player["player_ID"], second_player["name"], second_player["first_name"])
+                                        ])
+
+        return our_evens, our_evens_with_name
 
 
 if __name__ == '__main__':
