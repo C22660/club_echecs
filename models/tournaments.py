@@ -99,6 +99,44 @@ class Tournament:
         self.rounds[current_round_index][0]["matches"] = scored_matches
         Tournament.users.update({"rounds": self.rounds}, doc_ids=[self.id])
 
+    def number_of_rounds_decrement(self):
+        rounds_remaining = self.number_of_rounds - len(self.rounds)
+
+        return rounds_remaining
+
+    def sum_score_of_players(self):
+        current_round_index = len(self.rounds) - 1
+        all_matches = []
+        sum_scores = {}
+        # on prépare la dictionnaire sum_score à accueillir un couple clé "ID" une valeur cumul de score
+        # {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
+        for id in self.players:
+            sum_scores[id] = 0
+
+        # on récupère chaque round de match
+        for each_round in self.rounds:
+            total_matches = each_round[0]["matches"]
+        # puis, on va chercher chaque match pour ne faire qu'une liste de tous les  couples ID Scores [[1, 7], [1, 0]]..
+            for element in total_matches:
+                all_matches.append(element)
+        # on parcours cette liste complète, index 0
+        for couple in all_matches:
+            id_first_player = couple[0][0]
+            score_first_player = couple[1][0]
+            for key, value in sum_scores.items():
+                if key == id_first_player:
+                    sum_scores[key] = value+score_first_player
+        # même chose pour le deuxième joueur, index 1
+        for couple in all_matches:
+            id_second_player = couple[0][1]
+            score_second_player = couple[1][1]
+            for key, value in sum_scores.items():
+                if key == id_second_player:
+                    sum_scores[key] = value+score_second_player
+
+        return sum_scores
+
+
 
 if __name__ == '__main__':
 
@@ -126,16 +164,23 @@ if __name__ == '__main__':
     # tournoi.save_scored_matches(results_matches)
     # print(tournoi.rounds)
     # # # # -------
+    # id_current_tournament = len(Tournament.users)
+    # tournoi = Tournament.get_by_id(id=id_current_tournament)
+    # matches = tournoi.extract_match_to_add_scores()
+    # print(matches)
+    # for element in matches:
+    #     id_first_player = element[0][0]
+    #     score_first_player = element[1][0]
+    #     print("joueur", id_first_player, "score", score_first_player)
+    # print("second")
+    # for element in matches:
+    #     id_second_player = element[0][1]
+    #     score_second_player = element[1][1]
+    #     print("joueur", id_second_player, "score", score_second_player)
+    # -----
     id_current_tournament = len(Tournament.users)
     tournoi = Tournament.get_by_id(id=id_current_tournament)
-    matches = tournoi.extract_match_to_add_scores()
-    print(matches)
-    for element in matches:
-        id_first_player = element[0][0]
-        score_first_player = element[1][0]
-        print("joueur", id_first_player, "score", score_first_player)
-    print("second")
-    for element in matches:
-        id_second_player = element[0][1]
-        score_second_player = element[1][1]
-        print("joueur", id_second_player, "score", score_second_player)
+    result = tournoi.sum_score_of_players()
+    for k, v in sorted(result.items(), key=lambda x: x[1], reverse=True):
+        # print(k, v)
+        print(f"Le joueur {k} totalise {v} point(s).")

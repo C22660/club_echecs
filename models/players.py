@@ -22,10 +22,6 @@ class Player:
         self.point = point
         self.id = id
 
-        # création, lors de l'init, d'une liste des joueurs
-        # avec le nombre de point par défaut à 0 pour la première partie
-        # self.team_players.append(self)
-
     def add_player_inputs(self):
         """ 1 Verifie si le joueur n'est pas dans la base et sinon l'joute et si oui, mise à 0 des points"""
         # vérification que le joueur n'existe pas dans la base joueur (avec where et pas query)
@@ -66,23 +62,10 @@ class Player:
         return cls(name=data['name'], first_name=data['first_name'], birth=data['birth'],
                    ranking=data['ranking'], point=data['points'], id=id)
 
-    # def generate_team(self):
-    #     """Adresse la liste des joueurs à Evens pour création des premières paires de joueurs.
+    # def generate_another_teams(self):
+    #     """Adresse la liste des joueurs à Evens pour création des paires suivantes.
     #     """
-    #     # for i in range(len(self.team_players)):
-    #     #     print(self.team_players[i].index(2,4))
-    #     # # for i in self.team_players:
-    #     # # for i in self.team_players:
-    #     # #     return self.point, self.ranking, self.player_ID
-    #     # return self.team_players
-    #
-    #
-    #     return Pair.sort_players_ranking(self.team_players)
-
-    def generate_another_teams(self):
-        """Adresse la liste des joueurs à Evens pour création des paires suivantes.
-        """
-        return Pair.sort_players_points(self.team_players)
+    #     return Pair.sort_players_points(self.team_players)
 
     def __str__(self):
         return f"le joueur ID {self.id} = {self.name} {self.first_name}, né le {self.birth}, classé {self.ranking}"
@@ -98,6 +81,18 @@ class Player:
                             self.first_name) & (where('birth') == self.birth)
                             )
         return True
+
+    def all_actors_by_alpha(self):
+        actors = Player.users.search(where('name') != "")
+        actors_by_alpha = sorted(actors, key=lambda k: k['name'])
+
+        return actors_by_alpha
+
+    def all_actors_by_ranking(self):
+        actors = Player.users.search(where('ranking') != "")
+        actors_by_rank = sorted(actors, key=lambda k: k['ranking'], reverse=True)
+
+        return actors_by_rank
 
 
 if __name__ == '__main__':

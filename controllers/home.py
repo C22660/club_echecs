@@ -1,3 +1,5 @@
+import time
+
 from tools.menus import Menu
 from views import views
 from models.players import Player
@@ -22,7 +24,7 @@ class ApplicationController:
         actions = (("Créer un tournoi", TournamentCreationController()), ("Saisir la liste des joueurs",
                    PlayersCreationController()),
                    ("Modifier le rang d'un joueur", ModificationRankingController()),
-                   ("Autres rounds", OtherRoundsController())
+                   ("Autres rounds", OtherRoundsController()), ("Rapport du tournoi", ReportController())
                     )
         # au démarrage, on instancie le HomeMenuController
         self.controller = HomeMenuController()
@@ -271,7 +273,7 @@ class MatchesController:
         print("matches = tournoi.extract_match_to_add_scores()")
         print(matches)
         # Le gestionnaire va saisir les scores
-        print('"'*50)
+        print('"'*70)
         print("Vous allez procéder à la saisie des résultats")
         for i in matches[0]:
             match = MatchResults(i)
@@ -322,54 +324,106 @@ class ModificationRankingController:
 
 class OtherRoundsController:
     """une fois les premiers matches réalisés, collecte la synthèse des matches depuis la base tournoi
-        et met à jour les scores dans la class joueurs pour générer de nouvelles paires, puis un nouveau round."""
+        et met à jour les scores dans la class joueurs pour générer de nouvelles paires, puis un nouveau round.
+
+        Par défaut, l'id du tournoi est le tournoi en cours, soit le dernier des tournois enregistrés"""
+
+    id_tournament = len(Tournament.users)
+
+    def __init__(self, id_tournament=id_tournament):
+        self.id_tournament = id_tournament
+
+
     def __call__(self):
-        id_current_tournament = len(Tournament.users)
-        tournoi = Tournament.get_by_id(id=id_current_tournament)
+        tournoi = Tournament.get_by_id(id=self.id_tournament)
         result = tournoi.extract_match_to_add_scores()
-        # result comprend une liste des matches et le numéro du round
-        matches = result[0]
-        round_number = result[1]
-        for element in matches:
-            id_first_player = element[0][0]
-            score_first_player = element[1][0]
-            player = Player.get_by_id(id=id_first_player)
-            player.modifie_player_point(score_first_player)
-            player_serialized = player.serialization_players()
-            # ajout du joueur sérialisé dans la class Pair
-            preparation_even = Pair(player_serialized)
-            preparation_even.add_players_pairs()
-        for element in matches:
-            id_second_player = element[0][1]
-            score_second_player = element[1][1]
-            player = Player.get_by_id(id=id_second_player)
-            player.modifie_player_point(score_second_player)
-            player_serialized = player.serialization_players()
-            # ajout du joueur sérialisé dans la class Pair
-            preparation_even = Pair(player_serialized)
-            preparation_even.add_players_pairs()
+        rounds_remaining = tournoi.number_of_rounds_decrement()
+        if rounds_remaining == 0:
+            print("°"*70)
+            print("°                   Tous les matches ont été joués                   °")
+            print("°           Vous allez être redirigé sur le menu principal           °")
+            print("°" * 70)
+            time.sleep(3)
+            return HomeMenuController()
+        else:
+            print(f"Il reste {rounds_remaining} round(s) à jouer.")
+            # result comprend une liste des matches et le numéro du round
+            matches = result[0]
+            round_number = result[1]
+            for element in matches:
+                id_first_player = element[0][0]
+                score_first_player = element[1][0]
+                player = Player.get_by_id(id=id_first_player)
+                player.modifie_player_point(score_first_player)
+                player_serialized = player.serialization_players()
+                # ajout du joueur sérialisé dans la class Pair
+                preparation_even = Pair(player_serialized)
+                preparation_even.add_players_pairs()
+            for element in matches:
+                id_second_player = element[0][1]
+                score_second_player = element[1][1]
+                player = Player.get_by_id(id=id_second_player)
+                player.modifie_player_point(score_second_player)
+                player_serialized = player.serialization_players()
+                # ajout du joueur sérialisé dans la class Pair
+                preparation_even = Pair(player_serialized)
+                preparation_even.add_players_pairs()
 
-        # Une fois les paires effectuées (avec les points puis rangs si nécessaire, affichage à l'écran
-        our_pairs = preparation_even.sort_players_points()
-        print("*" * 70)
-        print(" Les paires de joueurs sont : ")
-        for couple in our_pairs[1]:
-            print(f'{couple[0]} <---&---> {couple[1]}')
+            # Une fois les paires effectuées (avec les points puis rangs si nécessaire, affichage à l'écran
+            our_pairs = preparation_even.sort_players_points()
+            print("*" * 70)
+            print(" Les paires de joueurs sont : ")
+            for couple in our_pairs[1]:
+                print(f'{couple[0]} <---&---> {couple[1]}')
 
-        # passage de ces paires à la class Round
-        new_round = Round(round_number+1, our_pairs[0])
+            # passage de ces paires à la class Round
+            new_round = Round(round_number+1, our_pairs[0])
 
-        # on récupère les rondes sous la bonne mise en forme, et on l'adresse à Tournament
-        # la class Tournament est "réveillée" par la @classmethode et récupère les infos contenues dans sa base
-        rondes = new_round.add_pairs()
-        id_current_tournament = len(Tournament.users)
-        tournoi = Tournament.get_by_id(id=id_current_tournament)
-        tournoi.add_rounds(rondes)
+            # on récupère les rondes sous la bonne mise en forme, et on l'adresse à Tournament
+            # la class Tournament est "réveillée" par la @classmethode et récupère les infos contenues dans sa base
+            rondes = new_round.add_pairs()
+            id_current_tournament = len(Tournament.users)
+            tournoi = Tournament.get_by_id(id=id_current_tournament)
+            tournoi.add_rounds(rondes)
 
-        return MatchesController()
+            return MatchesController()
 
 
+class ReportController:
+    """Gère le rapport final du tournois"""
 
+    id_tournament = len(Tournament.users)
+
+    def __init__(self, id_tournament=id_tournament):
+        self.id_tournament = id_tournament
+
+    def __call__(self):
+        # Liste de tous les acteurs
+        print("Liste de tous les acteurs en base de données :")
+        # par alpha
+        print("-----> par ordre alphabétique : ")
+        player = Player.get_by_id(id=1)
+        actors_by_alpha = player.all_actors_by_alpha()
+        for element in actors_by_alpha:
+            print(f"{element['name']} {element['first_name']}")
+        # par rang
+        print("")
+        print("-----> par classement : ")
+        player = Player.get_by_id(id=1)
+        actors_by_rank = player.all_actors_by_ranking()
+        for element in actors_by_rank:
+            print(f"{element['name']} {element['first_name']}, rang : {element['ranking']}")
+
+
+        # # les joueurs par nombre de points
+        # print("Les joueurs papr nombre de points gagnés : ")
+        # tournoi = Tournament.get_by_id(id=self.id_tournament)
+        # result = tournoi.sum_score_of_players()
+        # for k, v in sorted(result.items(), key=lambda x: x[1], reverse=True):
+        #     # print(k, v)
+        #     print(f"Le joueur {k} totalise {v} point(s).")
+
+        return HomeMenuController()
 
 class OngoingGameController:
     pass
