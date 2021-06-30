@@ -9,9 +9,6 @@ from tools.timestamp import TimeStamp
 
 # à 1 attibut liste round qui contient une liste d'objets round [round(1), round(2)]
 
-
-
-
 class Tournament:
     """Gère la création du tounroi et son ajout dans la base"""
 
@@ -20,7 +17,8 @@ class Tournament:
 
     number_of_rounds = 4
 
-    def __init__(self, name, place, date, time_control, description=None, players=None, rounds=None, id=None, number_of_rounds=number_of_rounds):
+    def __init__(self, name, place, date, time_control, description=None, players=None, rounds=None, id=None,
+                 number_of_rounds=number_of_rounds):
         self.tournament = []
         self.name = name
         self.place = place
@@ -56,7 +54,6 @@ class Tournament:
             search_id = Tournament.users.get((where('name') == self.name) & (where('place') == self.place))
             self.id = search_id.doc_id
 
-
             return True
 
         else:
@@ -74,6 +71,9 @@ class Tournament:
         self.players.append(player)
         Tournament.users.update({"players": self.players}, doc_ids=[self.id])
         return True
+
+    def extract_players(self):
+        return self.players
 
     def add_rounds(self, new_round):
         self.rounds.append(new_round)
@@ -136,9 +136,31 @@ class Tournament:
 
         return sum_scores
 
+    def extract_all_tournaments(self):
+        tournaments = Tournament.users.search(where('name') != "")
+        for tournament in tournaments:
+            id_tournament = tournament.doc_id
+
+            return f"Le tournoi ID n°{id_tournament}, {tournament['name']}, à eu lieu à {tournament['place']} " \
+                   f"en date du {tournament['date']}."
+
+    def extract_all_matches_to_report(self):
+        recap_matches_by_tournaments = []
+        tournaments = Tournament.users.search(where('name') != "")
+
+        for element in tournaments:
+            id_tournament = element.doc_id
+            recap_rounds = element["rounds"]
+            for recap_round in recap_rounds:
+                for rounds_per_tournament in recap_round:
+                    recap_matches_by_tournaments.append([id_tournament, rounds_per_tournament['Round'],
+                                                         rounds_per_tournament['matches']])
+
+        return recap_matches_by_tournaments
 
 
 if __name__ == '__main__':
+    pass
 
     # # 1 liste = [{'Round': 3, 'matches': [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None],
     #     [('6', '2'), None]], 'lancement': None, 'fin': None}]
@@ -178,9 +200,9 @@ if __name__ == '__main__':
     #     score_second_player = element[1][1]
     #     print("joueur", id_second_player, "score", score_second_player)
     # -----
-    id_current_tournament = len(Tournament.users)
-    tournoi = Tournament.get_by_id(id=id_current_tournament)
-    result = tournoi.sum_score_of_players()
-    for k, v in sorted(result.items(), key=lambda x: x[1], reverse=True):
-        # print(k, v)
-        print(f"Le joueur {k} totalise {v} point(s).")
+    # id_current_tournament = len(Tournament.users)
+    # tournoi = Tournament.get_by_id(id=id_current_tournament)
+    # result = tournoi.sum_score_of_players()
+    # for k, v in sorted(result.items(), key=lambda x: x[1], reverse=True):
+    #     # print(k, v)
+    #     print(f"Le joueur {k} totalise {v} point(s).")

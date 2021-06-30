@@ -94,6 +94,11 @@ class Player:
 
         return actors_by_rank
 
+    def all_players_by_alpha_and_ranking(self):
+        one_player = {"ID": self.id, "name": self.name, "first_name": self.first_name, "ranking": self.ranking}
+        return one_player
+
+
 
 if __name__ == '__main__':
     def generateur(matches):

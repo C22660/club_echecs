@@ -333,7 +333,6 @@ class OtherRoundsController:
     def __init__(self, id_tournament=id_tournament):
         self.id_tournament = id_tournament
 
-
     def __call__(self):
         tournoi = Tournament.get_by_id(id=self.id_tournament)
         result = tournoi.extract_match_to_add_scores()
@@ -396,32 +395,76 @@ class ReportController:
 
     def __init__(self, id_tournament=id_tournament):
         self.id_tournament = id_tournament
+        self.player_by_alpha = []
 
     def __call__(self):
-        # Liste de tous les acteurs
-        print("Liste de tous les acteurs en base de données :")
+        # # --- Liste de tous les acteurs ---
+        print("'"*70)
+        print("'                        R  A  P  P  O  R  T                         '")
+        print("'" * 70)
+        print("")
+        print("1 - Liste de tous les acteurs en base de données :")
         # par alpha
         print("-----> par ordre alphabétique : ")
-        player = Player.get_by_id(id=1)
-        actors_by_alpha = player.all_actors_by_alpha()
+        actor = Player.get_by_id(id=1)
+        actors_by_alpha = actor.all_actors_by_alpha()
         for element in actors_by_alpha:
             print(f"{element['name']} {element['first_name']}")
         # par rang
         print("")
         print("-----> par classement : ")
-        player = Player.get_by_id(id=1)
-        actors_by_rank = player.all_actors_by_ranking()
+        actor = Player.get_by_id(id=1)
+        actors_by_rank = actor.all_actors_by_ranking()
         for element in actors_by_rank:
             print(f"{element['name']} {element['first_name']}, rang : {element['ranking']}")
 
+        #--- Liste de tous les joueurs d'un tournoi ---
+        print("-"*70)
+        print("2 - Liste de tous les joueurs du tournoi :")
+        id_current_tournament = len(Tournament.users)
+        tournoi = Tournament.get_by_id(id=id_current_tournament)
+        player_by_alpha = tournoi.extract_players()
+        for p in player_by_alpha:
+            player = Player.get_by_id(id=p)
+            result = player.all_players_by_alpha_and_ranking()
+            self.player_by_alpha.append(result)
+        print("")
+        print("-----> par ordre alphabétique : ")
+        result_by_alpha = sorted(self.player_by_alpha, key=lambda k: k['name'])
+        for element in result_by_alpha:
+            print(f"{element['name']} {element['first_name']}")
+        print("")
+        print("-----> par classement : ")
+        result_by_alpha = sorted(self.player_by_alpha, key=lambda k: k['ranking'], reverse=True)
+        for element in result_by_alpha:
+            print(f"{element['ranking']}, {element['name']} {element['first_name']}")
+        print("")
+        print("-----> par nombre de points gagnés : ")
+        tournoi = Tournament.get_by_id(id=self.id_tournament)
+        result = tournoi.sum_score_of_players()
+        for k, v in sorted(result.items(), key=lambda x: x[1], reverse=True):
+            # print(k, v)
+            # print(f"Le joueur {k} totalise {v} point(s).")
+            player = Player.get_by_id(id=k)
+            print(f"{player} a totalisé {v} point(s).")
 
-        # # les joueurs par nombre de points
-        # print("Les joueurs papr nombre de points gagnés : ")
-        # tournoi = Tournament.get_by_id(id=self.id_tournament)
-        # result = tournoi.sum_score_of_players()
-        # for k, v in sorted(result.items(), key=lambda x: x[1], reverse=True):
-        #     # print(k, v)
-        #     print(f"Le joueur {k} totalise {v} point(s).")
+        #--- Liste de tous les tournois ---
+        print("-"*70)
+        print("2 - Liste du(des) tournoi(s) enregistré(s) :")
+        print(tournoi.extract_all_tournaments())
+
+        #--- Liste de tous les matches et round des tournois ---
+        print("-"*70)
+        print("3 - Liste de tous les rounds et matches du(des) tournoi(s) :")
+        all_matches = tournoi.extract_all_matches_to_report()
+        for component in all_matches:
+            # print(index, component)
+            print(f"Pour le tounoi {component[0]}, les matches du round {component[1]} sont : ")
+            for i in component[2]:
+                print(f" joueurs = {i[0]}, score = {i[1]}")
+        #     print(component)
+        # # ([f"Pour le round {rounds_per_tournament['Round']}, les matches sont (joueurs et scores) :"
+        # #                           f" {rounds_per_tournament['matches']}."])
 
         return HomeMenuController()
 
