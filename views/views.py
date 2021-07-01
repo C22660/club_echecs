@@ -5,8 +5,8 @@ class HomeMenuView:
         self.menu = menu
 
     def _display_menu(self):
-        print("**********      MENU PRINCIPAL      **********")
-        print("-"*50)
+        print("**********                  MENU PRINCIPAL                  **********")
+        print("-"*70)
         # à partir de la méthode items de la class menu
         for key, entry in self.menu.items():
             print(f"{key}: {entry.option}")
@@ -41,9 +41,13 @@ class TournamentCreationView:
         place = input("Lieu du tournoi ? ").upper()
         return place
 
-    def get_tournament_date(self):
-        date = input("date(s) du tournoi ? ")
-        return date
+    def get_tournament_start_date(self):
+        start_date = input("date du tournoi, ou du début de tournoi (jj/mm/aaaa) ? ")
+        return start_date
+
+    def get_tournament_end_date(self):
+        end_date = input("date de fin de tournoi, ou même date si un seul jour (jj/mm/aaaa) ? ")
+        return end_date
 
     def get_tournament_time(self):
         time_control = input("Quelle contrôle de temps choisissez vous pour ce tournoi ? \n"
@@ -80,7 +84,7 @@ class PlayersElementsView:
 
     def get_new_ranking(self):
         print("-"*70)
-        print(f"Pour modisfier le rang d'un joueur, merci de compléter les champs suivants :")
+        print(f"Pour modifier le rang d'un joueur, merci de compléter les champs suivants :")
         print("-"*70)
 
     def get_player_name(self):

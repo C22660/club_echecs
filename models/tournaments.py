@@ -17,12 +17,13 @@ class Tournament:
 
     number_of_rounds = 4
 
-    def __init__(self, name, place, date, time_control, description=None, players=None, rounds=None, id=None,
+    def __init__(self, name, place, start_date, end_date, time_control, description=None, players=None, rounds=None, id=None,
                  number_of_rounds=number_of_rounds):
         self.tournament = []
         self.name = name
         self.place = place
-        self.date = date
+        self.start_date = start_date
+        self.end_date = end_date
         self.number_of_rounds = number_of_rounds
         self.time_control = time_control
         self.description = description
@@ -44,12 +45,15 @@ class Tournament:
         new_tournament = Tournament.users.get((where('name') == self.name) & (where('place') == self.place))
         if not new_tournament:
             # ajout dans la liste tournament
-            self.tournament.append([self.name, self.place, self.date, self.time_control, self.number_of_rounds,
-                                    self.time_control, self.description, self.rounds, self.players])
+            self.tournament.append([self.name, self.place, self.start_date, self.end_date, self.time_control,
+                                    self.number_of_rounds, self.time_control, self.description, self.rounds,
+                                    self.players]
+                                   )
             # ajout dans la base de données
-            Tournament.users.insert({"name": self.name, "place": self.place, "date": self.date,
-                                     "Controle de temps": self.time_control, "nombre de rounds": self.number_of_rounds,
-                                     "description": self.description, "rounds": self.rounds, "players": self.players})
+            Tournament.users.insert({"name": self.name, "place": self.place, "start_date": self.start_date,
+                                     "end_date": self.end_date, "Controle de temps": self.time_control,
+                                     "nombre de rounds": self.number_of_rounds, "description": self.description,
+                                     "rounds": self.rounds, "players": self.players})
 
             search_id = Tournament.users.get((where('name') == self.name) & (where('place') == self.place))
             self.id = search_id.doc_id
@@ -64,8 +68,10 @@ class Tournament:
         """ Pour permettre la mise à jour des rounds d'un tournoi, recherche des éléments dans la base de données à
          partir de l'ID du tournoi (recréation de l'objet tournoi)"""
         data = Tournament.users.get(doc_id=id)
-        return cls(name=data['name'], place=data['place'], date=data['date'], time_control=data['Controle de temps'],
-                   description=data['description'], rounds=data['rounds'], players=data['players'], id=id)
+        return cls(name=data['name'], place=data['place'], start_date=data['start_date'], end_date=data['end_date'],
+                   time_control=data['Controle de temps'], description=data['description'], rounds=data['rounds'],
+                   players=data['players'], id=id
+                   )
 
     def add_players(self, player):
         self.players.append(player)
@@ -137,12 +143,15 @@ class Tournament:
         return sum_scores
 
     def extract_all_tournaments(self):
+        all_tournaments = []
         tournaments = Tournament.users.search(where('name') != "")
         for tournament in tournaments:
             id_tournament = tournament.doc_id
 
-            return f"Le tournoi ID n°{id_tournament}, {tournament['name']}, à eu lieu à {tournament['place']} " \
-                   f"en date du {tournament['date']}."
+            all_tournaments.append(f"Le tournoi ID n°{id_tournament}, {tournament['name']}, à eu lieu à "
+                                   f"{tournament['place']} en date du {tournament['start_date']}.")
+
+        return all_tournaments
 
     def extract_all_matches_to_report(self):
         recap_matches_by_tournaments = []

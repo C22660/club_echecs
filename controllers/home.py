@@ -9,11 +9,11 @@ from models.pairs import Pair
 from models.tournaments import Tournament
 from models.rounds import Round
 from models.matches import MatchResults
-from tools.inputs_check import check_names, check_birth_date, check_tournament_date
+from tools.inputs_check import check_names, check_date
 
 """les inputs ici"""
 
-# 1 AppliationController est le chef d'orchestre
+# 1 ApplicationController est le chef d'orchestre
 
 
 class ApplicationController:
@@ -77,9 +77,6 @@ class HomeMenuController:
         self.view = views.HomeMenuView(self.menu)
         self.actions = []
 
-    # def add_actions(self, elements):
-    #     self.actions.append[elements]
-
     def __call__(self):
         for sujet in self.actions_elements:
             self.menu.add("auto", sujet[0], sujet[1])
@@ -126,16 +123,22 @@ class TournamentCreationController:
             print("!           Merci de saisir un nom de lieu pour ce tournoi           !")
             print("!" * 70)
             name = self.view.get_tournament_place()
-        date = self.view.get_tournament_date()
-        while not check_tournament_date(date):
+        start_date = self.view.get_tournament_start_date()
+        while not check_date(start_date):
             print("!"*70)
-            print("!           Merci de saisir un nom de lieu pour ce tournoi           !")
+            print("! Merci de saisir une date de tournoi, ou de début de tournoi valide !")
             print("!" * 70)
-            name = self.view.get_tournament_place()
+            start_date = self.view.get_tournament_start_date()
+        end_date = self.view.get_tournament_end_date()
+        while not check_date(end_date):
+            print("!" * 70)
+            print("! Merci de saisir une date de fin de tournoi valide (même date si jour unique) !")
+            print("!" * 70)
+            end_date = self.view.get_tournament_end_date()
         time_control = self.view.get_tournament_time()
         description = self.view.get_trournament_description()
 
-        new_tournament = Tournament(name, place, date, time_control, description)
+        new_tournament = Tournament(name, place, start_date, end_date, time_control, description)
         enregistrement = new_tournament.add_tournament_inputs()
         if enregistrement:
             numero = new_tournament.id
@@ -168,7 +171,7 @@ class PlayersCreationController:
             add_data_base = new_player.add_player_inputs()
             if not add_data_base:
                 print('"' * 70)
-                print('"         ------INFO-----> Joueur déjà présent dans la base.          ')
+                print('"------INFO-----> Joueur déjà présent. Seul le rang a été modifié."')
                 print('"' * 70)
                 print("")
                 counter -= 1
@@ -204,7 +207,8 @@ class PlayersCreationController:
         tournoi = Tournament.get_by_id(id=id_current_tournament)
         tournoi.add_rounds(rondes)
 
-        return MatchesController()
+        # return MatchesController()
+        return HomeMenuController()
 
     def player_addition(self, counter):
         """permet de répéter la collecte de l'ensemble des éléments d'un joueur
@@ -226,6 +230,11 @@ class PlayersCreationController:
             print("!" * 29)
             first_name = self.view.get_player_first_name()
         birth = self.view.get_player_birth()
+        while not check_date(birth):
+            print("!" * 29)
+            print("! Merci de saisir une date valide (jj/mm/aaaa) !")
+            print("!" * 29)
+            birth = self.view.get_player_birth()
         sex = self.view.get_player_sex()
         ranking = self.view.get_player_ranking()
         while not ranking.isdigit():
@@ -249,22 +258,24 @@ class MatchesController:
         id_current_tournament = len(Tournament.users)
         tournoi = Tournament.get_by_id(id=id_current_tournament)
         # on démarre les matches et donc on ajoute l'heure et la date de démarrage
-        lancement = input("Quand vous souhaitez lancer les matches, saisissez G (comme Go) : ")
-        while lancement not in ("g", "G"):
-            print("Erreur de commande.")
-            input(lancement)
-        else:
-            tournoi.start_current_round()
+        while True:
+            lancement = input("Quand vous souhaitez lancer les matches, saisissez G (comme Go) : ")
+            if lancement not in ("g", "G"):
+                print("Erreur de commande.")
+            else:
+                tournoi.start_current_round()
+                break
         print("-"*70)
         print("------> JEU EN COURS                                                ")
         print("-"*70)
         # 10 on arrête le jeux quand les matches sont terminés
-        stop = input("Quans vous souhaitez arrêter les matches, saisissez S (comme Stop) : ")
-        if stop in ("s", "S"):
-            tournoi.end_current_round()
-        else:
-            print("Erreur de commande")
-            return stop
+        while True:
+            stop = input("Quans vous souhaitez arrêter les matches, saisissez S (comme Stop) : ")
+            if stop in ("s", "S"):
+                tournoi.end_current_round()
+                break
+            else:
+                print("Désolé, erreur de commande.")
         print("")
         print("------> JEU TERMINÉ")
         print("")
@@ -277,18 +288,14 @@ class MatchesController:
         print("Vous allez procéder à la saisie des résultats")
         for i in matches[0]:
             match = MatchResults(i)
-            print(match.get_players_by_id())
+            # print(match.get_players_by_id())   -> Print à supprimer ?
             saisie = input("Saisissez l'ID gagnant ou N pour matche nul : ")
             print(type(saisie))
             print("-" * 47)
-            # match.check_input_winner()
             match.set_winner(saisie)
-            print(match.player_1_id, match.player_2_id)
-            print("type self id")
-            print(type(match.player_1_id))
+            # print(match.player_1_id, match.player_2_id)    -> Print à supprimer ?
         results_matches = MatchResults.matches
-        print("ds home results_matches")
-        print(results_matches)
+        # print(results_matches) -> Print à supprimer ?
         tournoi.save_scored_matches(results_matches)
         # print(tournoi.rounds)
         # if match.set_winner(saisie):
@@ -316,7 +323,8 @@ class ModificationRankingController:
         if check_modification:
             print("Modification de rang enregistrée")
         else:
-            print("Joueur non trouvé")
+            print("")
+            print("Désolé, ce joueur n'existe pas.")
 
 
         return HomeMenuController()
@@ -443,15 +451,15 @@ class ReportController:
         tournoi = Tournament.get_by_id(id=self.id_tournament)
         result = tournoi.sum_score_of_players()
         for k, v in sorted(result.items(), key=lambda x: x[1], reverse=True):
-            # print(k, v)
-            # print(f"Le joueur {k} totalise {v} point(s).")
             player = Player.get_by_id(id=k)
             print(f"{player} a totalisé {v} point(s).")
 
         #--- Liste de tous les tournois ---
         print("-"*70)
         print("2 - Liste du(des) tournoi(s) enregistré(s) :")
-        print(tournoi.extract_all_tournaments())
+        the_tournaments = tournoi.extract_all_tournaments()
+        for t in the_tournaments:
+            print(t +"\n")
 
         #--- Liste de tous les matches et round des tournois ---
         print("-"*70)

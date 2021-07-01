@@ -1,5 +1,6 @@
 import string
 import unidecode
+import datetime
 
 """ Créer une vérification de la conformité des saisies manuelles"""
 
@@ -27,8 +28,16 @@ def check_names(text):
         if not text.isspace():
             return True
 
-def check_birth_date(date):
-    return True
+def check_date(date):
+    """Verifie que le bon format de date a été saisi"""
+    format = "%d/%m/%Y"
 
-def check_tournament_date(date):
-    return True
+    try:
+        datetime.datetime.strptime(date, format)
+        return True
+    except ValueError:
+        return False
+
+
+if __name__ == '__main__':
+    print(check_date("12/12/2010"))

@@ -28,14 +28,14 @@ class Player:
         if not Player.users.get((where('name') == self.name) & (where('first_name') == self.first_name) &
                                 (where('birth') == self.birth)):
             # ajout dans la liste team_player
-            self.team_players.append([self.name, self.first_name, self.birth, self.sex, self.ranking, self.point])
+            # self.team_players.append([self.name, self.first_name, self.birth, self.sex, self.ranking, self.point])
             # ajout dans la base de données
             Player.users.insert({"name": self.name, "first_name": self.first_name, "birth": self.birth, "sex": self.sex,
                                  "ranking": self.ranking, "points": self.point})
             return True
 
         else:
-            Player.users.update({"points": self.point}, (where('name') == self.name) & (where("first_name") ==
+            Player.users.update({"points": self.point}, {"ranking": self.ranking}, (where('name') == self.name) & (where("first_name") ==
                                 self.first_name) & (where('birth') == self.birth)
                                 )
             return False
@@ -62,25 +62,33 @@ class Player:
         return cls(name=data['name'], first_name=data['first_name'], birth=data['birth'],
                    ranking=data['ranking'], point=data['points'], id=id)
 
-    # def generate_another_teams(self):
-    #     """Adresse la liste des joueurs à Evens pour création des paires suivantes.
-    #     """
-    #     return Pair.sort_players_points(self.team_players)
+    @property
+    def player_found(self):
+        # retourne l'élément (comme si self.player_found) ou None si l'utilisateur n'existe pas
+        return Player.users.get((where('name') == self.name) & (where('first_name') == self.first_name) &
+                                    (where('birth') == self.birth)
+                                    )
 
     def __str__(self):
         return f"le joueur ID {self.id} = {self.name} {self.first_name}, né le {self.birth}, classé {self.ranking}"
 
+    def player_exists(self):
+        # Converti le retour de player_found en bouléen pour avoir True si données, ou False si pas de données
+        return bool(self.player_found)
+
     def modifie_player_ranking(self):
-        Player.users.update({"ranking": self.ranking}, (where('name') == self.name) & (where("first_name") ==
-                            self.first_name) & (where('birth') == self.birth))
-        return True
+        if self.player_exists():
+            Player.users.update({"ranking": self.ranking}, (where('name') == self.name) & (where("first_name") ==
+                                self.first_name) & (where('birth') == self.birth))
+            return True
 
     def modifie_player_point(self, point):
         self.point = point
-        Player.users.update({"points": self.point}, (where('name') == self.name) & (where("first_name") ==
-                            self.first_name) & (where('birth') == self.birth)
-                            )
-        return True
+        if self.player_exists():
+            Player.users.update({"points": self.point}, (where('name') == self.name) & (where("first_name") ==
+                                self.first_name) & (where('birth') == self.birth)
+                                )
+            return True
 
     def all_actors_by_alpha(self):
         actors = Player.users.search(where('name') != "")
