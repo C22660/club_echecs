@@ -36,7 +36,7 @@ class Round:
             du résultat du matche. Exemple [('1', '7'), None]"""
         matches = []
         for i in self.pairs:
-            matches.append([(i[0], i[1]), None])
+            matches.append([(i[0], i[1]), (0,0)])
         self.round[0]["matches"] = matches
         return self.round
 

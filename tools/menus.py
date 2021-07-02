@@ -35,8 +35,6 @@ class Menu:
         return self._entries[choice]
 
 
-
-
 if __name__ == "__main__":
     menu = Menu()
     menu.add("auto", "premiere option menu", lambda: None)

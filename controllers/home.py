@@ -24,7 +24,7 @@ class ApplicationController:
         actions = (("Créer un tournoi", TournamentCreationController()), ("Saisir la liste des joueurs",
                    PlayersCreationController()),
                    ("Modifier le rang d'un joueur", ModificationRankingController()),
-                   ("Autres rounds", OtherRoundsController()), ("Rapport du tournoi", ReportController())
+                   ("Gestion des rounds", RoundsController()), ("Rapport du tournoi", ReportController())
                     )
         # au démarrage, on instancie le HomeMenuController
         self.controller = HomeMenuController()
@@ -70,12 +70,11 @@ class ApplicationController:
 
 # class OtherMenuController:
 class HomeMenuController:
-    actions_elements = []
 
-    def __init__(self):
+    def __init__(self, actions=None):
         self.menu = Menu()
         self.view = views.HomeMenuView(self.menu)
-        self.actions = []
+        self.actions_elements = actions
 
     def __call__(self):
         for sujet in self.actions_elements:
@@ -100,10 +99,12 @@ class ConnectionMenuController:
 class SignupMenuController:
     pass
 
-# Création d'un nouveau tournoi
+# ETAPE 1 Création d'un nouveau tournoi
 class TournamentCreationController:
     """Contrôleur responsable de gérer le menu de  création
-     d'un nouveau tournoi.
+     d'un nouveau tournoi (nom, lieu, date(s), type de contrôle de temps (pour info), et commentaire éventuel).
+     Eléments sauvegardés dans la base tournoi.
+     Passe ensuite la main au contrôleur des joueurs.
      """
     def __init__(self):
         self.view = views.TournamentCreationView()
@@ -152,10 +153,13 @@ class TournamentCreationController:
 
         return PlayersCreationController()
 
-# Saisie des joueurs
+# ETAPE 2 Saisie des joueurs
 class PlayersCreationController:
-    """Contrôleur responsable de gérer le menu de  création et de gestion
-     des joueurs.
+    """Contrôleur responsable de gérer le menu de  création des joueurs du tournoi et formation des
+        premières paires de joueur.
+        Eléments joueurs sauvegardés dans la base joueurs.
+        Eléments des paires (et round) sauvegardés dans la base tournoi.
+        Passe ensuite la main au contrôleur des rounds.
      """
     def __init__(self):
         self.view = views.PlayersElementsView()
@@ -192,11 +196,14 @@ class PlayersCreationController:
         # 5 Une fois les paires effectuées, affichage à l'écran
         our_pairs = preparation_even.sort_players_ranking()
         print("*"*70)
-        print(" Les paires de joueurs sont : ")
+        print("*        Les premières paires de joueurs sont les suivantes.         *")
+        print("*   Vous allez être redirigez vers le menu pour lancer le round.     *")
+        print("*                               __  __                               *")
+        print("*                                 \/                                 *")
         # passer par la view car résultat :(12, 'MOUIL', 'Jule') <---&---> (11, 'POLIU', 'Lucienne')
         for couple in our_pairs[1]:
             print(f'{couple[0]} <---&---> {couple[1]}')
-
+        print("*" * 70)
         # 6 passage de ces paires à la class Round
         new_round = Round(1, our_pairs[0])
 
@@ -208,7 +215,13 @@ class PlayersCreationController:
         tournoi.add_rounds(rondes)
 
         # return MatchesController()
-        return HomeMenuController()
+        time.sleep(3)
+        actions = (("Créer un tournoi", TournamentCreationController()), ("Saisir la liste des joueurs",
+                                                                          PlayersCreationController()),
+                   ("Modifier le rang d'un joueur", ModificationRankingController()),
+                   ("Gestion des rounds", RoundsController()), ("Rapport du tournoi", ReportController())
+                   )
+        return HomeMenuController(actions)
 
     def player_addition(self, counter):
         """permet de répéter la collecte de l'ensemble des éléments d'un joueur
@@ -244,93 +257,9 @@ class PlayersCreationController:
             ranking = self.view.get_player_ranking()
         return name, first_name, birth, ranking, sex
 
-class MatchesController:
-    """Contrôle le lancement et l'arrêt des macthes, gère l'ajout des résultats et leurs sauvegardes dans la base
-        du tournoi en cours (round correspondant)
-         """
 
-    # def __init__(self):
-    #     self.view = views.PlayersElementsView()
-
-    def __call__(self):
-
-        # la class Tournament est "réveillée" par la @classmethode et récupère les infos contenues dans sa base
-        id_current_tournament = len(Tournament.users)
-        tournoi = Tournament.get_by_id(id=id_current_tournament)
-        # on démarre les matches et donc on ajoute l'heure et la date de démarrage
-        while True:
-            lancement = input("Quand vous souhaitez lancer les matches, saisissez G (comme Go) : ")
-            if lancement not in ("g", "G"):
-                print("Erreur de commande.")
-            else:
-                tournoi.start_current_round()
-                break
-        print("-"*70)
-        print("------> JEU EN COURS                                                ")
-        print("-"*70)
-        # 10 on arrête le jeux quand les matches sont terminés
-        while True:
-            stop = input("Quans vous souhaitez arrêter les matches, saisissez S (comme Stop) : ")
-            if stop in ("s", "S"):
-                tournoi.end_current_round()
-                break
-            else:
-                print("Désolé, erreur de commande.")
-        print("")
-        print("------> JEU TERMINÉ")
-        print("")
-        # on récupère dans le round de la base tournoi, la partie relative au matches
-        matches = tournoi.extract_match_to_add_scores()
-        print("matches = tournoi.extract_match_to_add_scores()")
-        print(matches)
-        # Le gestionnaire va saisir les scores
-        print('"'*70)
-        print("Vous allez procéder à la saisie des résultats")
-        for i in matches[0]:
-            match = MatchResults(i)
-            # print(match.get_players_by_id())   -> Print à supprimer ?
-            saisie = input("Saisissez l'ID gagnant ou N pour matche nul : ")
-            print(type(saisie))
-            print("-" * 47)
-            match.set_winner(saisie)
-            # print(match.player_1_id, match.player_2_id)    -> Print à supprimer ?
-        results_matches = MatchResults.matches
-        # print(results_matches) -> Print à supprimer ?
-        tournoi.save_scored_matches(results_matches)
-        # print(tournoi.rounds)
-        # if match.set_winner(saisie):
-        #     pass
-        # else:
-        #     return saisie
-        # 3 retour au menu général
-        return HomeMenuController()
-
-
-
-class ModificationRankingController:
-    """Permet de modifier le rang d'un joueur"""
-    def __init__(self):
-        self.view = views.PlayersElementsView()
-
-    def __call__(self):
-        self.view.get_new_ranking()
-        name = self.view.get_player_name()
-        first_name = self.view.get_player_first_name()
-        birth = self.view.get_player_birth()
-        ranking = self.view.get_player_ranking()
-        player_modified = Player(name, first_name, birth, ranking)
-        check_modification = player_modified.modifie_player_ranking()
-        if check_modification:
-            print("Modification de rang enregistrée")
-        else:
-            print("")
-            print("Désolé, ce joueur n'existe pas.")
-
-
-        return HomeMenuController()
-
-
-class OtherRoundsController:
+# ETAPE 3 Gestion des rounds
+class RoundsController:
     """une fois les premiers matches réalisés, collecte la synthèse des matches depuis la base tournoi
         et met à jour les scores dans la class joueurs pour générer de nouvelles paires, puis un nouveau round.
 
@@ -352,7 +281,12 @@ class OtherRoundsController:
             print("°" * 70)
             time.sleep(3)
             return HomeMenuController()
+        elif tournoi.number_of_rounds == rounds_remaining:
+            # Alors, les premières paires n'ont pas été encore jouées
+            print(f"Il reste tous les {tournoi.number_of_rounds} rounds à jouer.")
+            return MatchesController
         else:
+            # Sinon, réalisation de nouvelles paires de joueurs
             print(f"Il reste {rounds_remaining} round(s) à jouer.")
             # result comprend une liste des matches et le numéro du round
             matches = result[0]
@@ -395,7 +329,104 @@ class OtherRoundsController:
 
             return MatchesController()
 
+# ETAPE 5 Gestion des matches
+class MatchesController:
+    """Contrôle le lancement et l'arrêt des macthes, gère l'ajout des résultats et leur sauvegarde dans la base
+        du tournoi en cours (round correspondant)
+         """
 
+    # def __init__(self):
+    #     self.view = views.PlayersElementsView()
+
+    def __call__(self):
+
+        # la class Tournament est "réveillée" par la @classmethode et récupère les infos contenues dans sa base
+        id_current_tournament = len(Tournament.users)
+        tournoi = Tournament.get_by_id(id=id_current_tournament)
+        # on démarre les matches et donc on ajoute l'heure et la date de démarrage
+        while True:
+            lancement = input("Quand vous souhaitez lancer les matches, saisissez G (comme Go) : ")
+            if lancement not in ("g", "G"):
+                print("Erreur de commande.")
+            else:
+                tournoi.start_current_round()
+                break
+        print("-"*70)
+        print("------> JEU EN COURS                                                ")
+        print("-"*70)
+        # 10 on arrête le jeux quand les matches sont terminés
+        while True:
+            stop = input("Quans vous souhaitez arrêter les matches, saisissez S (comme Stop) : ")
+            if stop in ("s", "S"):
+                tournoi.end_current_round()
+                break
+            else:
+                print("Désolé, erreur de commande.")
+        print("")
+        print("------> JEU TERMINÉ")
+        print("")
+        # on récupère dans le round de la base tournoi, la partie relative au matches
+        matches = tournoi.extract_match_to_add_scores()
+        print("matches = tournoi.extract_match_to_add_scores()")
+        print(matches)
+        # Le gestionnaire va saisir les scores
+        print('"'*70)
+        print("Vous allez procéder à la saisie des résultats")
+        for i in matches[0]:
+            match = MatchResults(i)
+            print(match.get_players_by_id())
+            saisie = input("Saisissez l'ID gagnant ou N pour matche nul : ")
+            print("-" * 47)
+            match.set_winner(saisie)
+            # print(match.player_1_id, match.player_2_id)    -> Print à supprimer ?
+        results_matches = MatchResults.matches
+        # print(results_matches) -> Print à supprimer ?
+        tournoi.save_scored_matches(results_matches)
+        print("Saisie des résultats terminée.")
+        print("vous allez être redirigez vers le menu pour lancer le round.")
+        print('-'*70)
+        time.sleep(3)
+        actions = (("Créer un tournoi", TournamentCreationController()), ("Saisir la liste des joueurs",
+                                                                          PlayersCreationController()),
+                   ("Modifier le rang d'un joueur", ModificationRankingController()),
+                   ("Gestion des rounds", RoundsController()), ("Rapport du tournoi", ReportController())
+                   )
+        return HomeMenuController(actions)
+
+# OUTIL SI BESOIN Modification du rang d'un joueur
+class ModificationRankingController:
+    """Permet de modifier le rang d'un joueur"""
+    def __init__(self):
+        self.view = views.PlayersElementsView()
+
+    def __call__(self):
+        self.view.get_new_ranking()
+        name = self.view.get_player_name()
+        first_name = self.view.get_player_first_name()
+        birth = self.view.get_player_birth()
+        ranking = self.view.get_player_ranking()
+        player_modified = Player(name, first_name, birth, ranking)
+        check_modification = player_modified.modifie_player_ranking()
+        if check_modification:
+            print('-'*70)
+            print("Modification de rang enregistrée.")
+            print("Vous allez être redirigé vers le menu principal.")
+            print('-' * 70)
+        else:
+            print('-'*70)
+            print("Désolé, ce joueur n'existe pas.")
+            print("Vous allez être redirigé vers le menu principal.")
+            print('-' * 70)
+
+        actions = (("Créer un tournoi", TournamentCreationController()), ("Saisir la liste des joueurs",
+                                                                          PlayersCreationController()),
+                   ("Modifier le rang d'un joueur", ModificationRankingController()),
+                   ("Gestion des rounds", RoundsController()), ("Rapport du tournoi", ReportController())
+                   )
+        time.sleep(3)
+        return HomeMenuController(actions)
+
+# ETAPE 6 Edition des rapport
 class ReportController:
     """Gère le rapport final du tournois"""
 
@@ -404,8 +435,33 @@ class ReportController:
     def __init__(self, id_tournament=id_tournament):
         self.id_tournament = id_tournament
         self.player_by_alpha = []
+        # self.menu = HomeMenuController(actions)
 
     def __call__(self):
+        wich_report = input("1: Liste de tous les acteurs \n2: Liste de tous les joueurs d'un tournoi"
+                            "\n3: Liste de tous les tournois \n4: Liste de tous les tours et matches d'un tournoi"
+                            "\n5: Retour au menu principal \nIndiquez votre choix : ")
+
+        if wich_report == str(1):
+            self.all_actors()
+        elif wich_report == str(2):
+            self.players()
+        elif wich_report == str(3):
+            self.all_tournaments()
+        elif wich_report == str(4):
+            self.all_rounds_and_matches()
+        elif wich_report == str(5):
+            actions = (("Créer un tournoi", TournamentCreationController()), ("Saisir la liste des joueurs",
+                                                                              PlayersCreationController()),
+                       ("Modifier le rang d'un joueur", ModificationRankingController()),
+                       ("Gestion des rounds", RoundsController()), ("Rapport du tournoi", ReportController())
+                       )
+            return HomeMenuController(actions)
+        else:
+            print("Désolé, la saisie n'est pas conforme")
+            return ReportController()
+
+    def all_actors(self):
         # # --- Liste de tous les acteurs ---
         print("'"*70)
         print("'                        R  A  P  P  O  R  T                         '")
@@ -426,6 +482,7 @@ class ReportController:
         for element in actors_by_rank:
             print(f"{element['name']} {element['first_name']}, rang : {element['ranking']}")
 
+    def all_players(self):
         #--- Liste de tous les joueurs d'un tournoi ---
         print("-"*70)
         print("2 - Liste de tous les joueurs du tournoi :")
@@ -454,16 +511,22 @@ class ReportController:
             player = Player.get_by_id(id=k)
             print(f"{player} a totalisé {v} point(s).")
 
+    def all_tournaments(self):
         #--- Liste de tous les tournois ---
         print("-"*70)
         print("2 - Liste du(des) tournoi(s) enregistré(s) :")
+        id_current_tournament = len(Tournament.users)
+        tournoi = Tournament.get_by_id(id=id_current_tournament)
         the_tournaments = tournoi.extract_all_tournaments()
         for t in the_tournaments:
             print(t +"\n")
 
+    def all_rounds_and_matches(self):
         #--- Liste de tous les matches et round des tournois ---
         print("-"*70)
         print("3 - Liste de tous les rounds et matches du(des) tournoi(s) :")
+        id_current_tournament = len(Tournament.users)
+        tournoi = Tournament.get_by_id(id=id_current_tournament)
         all_matches = tournoi.extract_all_matches_to_report()
         for component in all_matches:
             # print(index, component)

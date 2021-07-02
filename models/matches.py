@@ -39,10 +39,8 @@ class MatchResults:
 
     def check_input_winner(self):
         saisie_id = input("Saisissez l'ID gagnant ou N pour matche nul : ")
-        print("-" * 47)
-        print(type(saisie_id))
+        print("-" * 70)
         good_inputs = (self.player_1_id, self.player_2_id, 'n', 'N')
-        # if saisie not in (self.player_1_id, self.player_2_id, 'n', 'N'):
         if saisie_id not in good_inputs:
             print(self.player_1_id, self.player_2_id)
             print("Attention, la saisie doit être un des ID ou N (pour nul)")
@@ -51,19 +49,12 @@ class MatchResults:
             self.set_winner(saisie_id)
 
     def set_winner(self, winner):
-        # if winner not in (self.player_1_id, self.player_2_id, 'n', 'N'):
-        #     # print(self.player_1_id, self.player_2_id)
-        #     return False
         if winner == str(self.player_1_id):
             self.score = (1, 0)
-            # self.players[0].add_win()
         elif winner == str(self.player_2_id):
             self.score = (0, 1)
-            # self.players[1].add_win()
         else:
             self.score = (0.5, 0.5)
-            # self.players[0].add_tie()
-            # self.players[1].add_tie()
 
         self.matche[1] = self.score
         self.matches.append(self.matche)
