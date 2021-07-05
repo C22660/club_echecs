@@ -167,6 +167,9 @@ class PlayersCreationController:
     def __call__(self):
         # 1 générer les inputs concernant les joueurs
         number_of_players = self.view.size_team()
+        while not number_of_players.isdigit() or not int(number_of_players) % 2 == 0 or not int(number_of_players) != 0:
+            print("Désolé, nombre pair obligatoire.")
+            number_of_players = self.view.size_team()
         counter = 1
         while counter < int(number_of_players)+1:
             addition = PlayersCreationController.player_addition(self, counter)
@@ -271,7 +274,11 @@ class RoundsController:
         self.id_tournament = id_tournament
 
     def __call__(self):
-        tournoi = Tournament.get_by_id(id=self.id_tournament)
+        # au premier jeux, sans enregistrement, self.id_tournament = 0
+        if self.id_tournament == 0:
+            tournoi = Tournament.get_by_id(id=1)
+        else:
+            tournoi = Tournament.get_by_id(id=self.id_tournament)
         result = tournoi.extract_match_to_add_scores()
         rounds_remaining = tournoi.number_of_rounds_decrement()
         if rounds_remaining == 0:
@@ -291,6 +298,8 @@ class RoundsController:
             # result comprend une liste des matches et le numéro du round
             matches = result[0]
             round_number = result[1]
+            # Remise à 0 de l'attribut de class our_players
+            Pair.our_players = []
             for element in matches:
                 id_first_player = element[0][0]
                 score_first_player = element[1][0]
@@ -309,6 +318,8 @@ class RoundsController:
                 # ajout du joueur sérialisé dans la class Pair
                 preparation_even = Pair(player_serialized)
                 preparation_even.add_players_pairs()
+                print("preparation_even", preparation_even)
+
 
             # Une fois les paires effectuées (avec les points puis rangs si nécessaire, affichage à l'écran
             our_pairs = preparation_even.sort_players_points()
@@ -323,6 +334,7 @@ class RoundsController:
             # on récupère les rondes sous la bonne mise en forme, et on l'adresse à Tournament
             # la class Tournament est "réveillée" par la @classmethode et récupère les infos contenues dans sa base
             rondes = new_round.add_pairs()
+            print("rondes = ", rondes)
             id_current_tournament = len(Tournament.users)
             tournoi = Tournament.get_by_id(id=id_current_tournament)
             tournoi.add_rounds(rondes)
@@ -530,7 +542,7 @@ class ReportController:
         all_matches = tournoi.extract_all_matches_to_report()
         for component in all_matches:
             # print(index, component)
-            print(f"Pour le tounoi {component[0]}, les matches du round {component[1]} sont : ")
+            print(f"Pour le tournoi {component[0]}, les matches du round {component[1]} sont : ")
             for i in component[2]:
                 print(f" joueurs = {i[0]}, score = {i[1]}")
         #     print(component)

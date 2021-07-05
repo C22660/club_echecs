@@ -17,8 +17,8 @@ class Tournament:
 
     number_of_rounds = 4
 
-    def __init__(self, name, place, start_date, end_date, time_control, description=None, players=None, rounds=None, id=None,
-                 number_of_rounds=number_of_rounds):
+    def __init__(self, name, place, start_date, end_date, time_control, description=None, players=None, rounds=None,
+                 id=None, number_of_rounds=number_of_rounds):
         self.tournament = []
         self.name = name
         self.place = place
@@ -112,9 +112,10 @@ class Tournament:
         for index, ronde in enumerate(self.rounds):
             if ronde[0].get("lancement") == None:
                 index_current_round = index
+            elif ronde[0].get("lancement") != None:
+                index_current_round = index +1
 
         rounds_remaining = self.number_of_rounds - index_current_round
-
         return rounds_remaining
 
     def sum_score_of_players(self):
@@ -218,8 +219,10 @@ if __name__ == '__main__':
     # -----
     id_current_tournament = len(Tournament.users)
     tournoi = Tournament.get_by_id(id=id_current_tournament)
-    tournoi.number_of_rounds_decrement()
-    # result = tournoi.sum_score_of_players()
-    # for k, v in sorted(result.items(), key=lambda x: x[1], reverse=True):
-    #     # print(k, v)
-    #     print(f"Le joueur {k} totalise {v} point(s).")
+    print(tournoi.rounds)
+    # result = tournoi.extract_match_to_add_scores()
+    # print(result)
+    # matches = result[0]
+    # round_number = result[1]
+    # print("matches = ", matches)
+    # print("round_number", round_number)

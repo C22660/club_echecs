@@ -13,12 +13,12 @@ class Player:
 
     team_players = []
 
-    def __init__(self, name=None, first_name=None, birth=None, ranking=None, sex=None, point='0', id=None):
+    def __init__(self, name=None, first_name=None, birth=None, ranking=None, sex=None, point=0, id=None):
         self.name = name
         self.first_name = first_name
         self.birth = birth
         self.sex = sex
-        self.ranking = ranking
+        self.ranking = int(ranking)
         self.point = point
         self.id = id
 
@@ -35,8 +35,8 @@ class Player:
             return True
 
         else:
-            Player.users.update({"points": self.point}, {"ranking": self.ranking}, (where('name') == self.name) & (where("first_name") ==
-                                self.first_name) & (where('birth') == self.birth)
+            Player.users.update({"points": self.point}, {"ranking": self.ranking}, (where('name') == self.name) &
+                                (where("first_name") == self.first_name) & (where('birth') == self.birth)
                                 )
             return False
 
