@@ -1,8 +1,6 @@
 from tinydb import TinyDB, Query, where
 from pathlib import Path
 
-from models.pairs import Pair
-
 
 class Player:
     """Gère la création des joueurs et leur ajout dans la base"""
@@ -24,20 +22,20 @@ class Player:
 
     def add_player_inputs(self):
         """ 1 Verifie si le joueur n'est pas dans la base et sinon l'joute et si oui, mise à 0 des points"""
-        # vérification que le joueur n'existe pas dans la base joueur (avec where et pas query)
-        if not Player.users.get((where('name') == self.name) & (where('first_name') == self.first_name) &
-                                (where('birth') == self.birth)):
-            # ajout dans la liste team_player
-            # self.team_players.append([self.name, self.first_name, self.birth, self.sex, self.ranking, self.point])
-            # ajout dans la base de données
+        # vérification que le joueur n'existe pas dans la base joueur
+        if not self.player_exists():
             Player.users.insert({"name": self.name, "first_name": self.first_name, "birth": self.birth, "sex": self.sex,
                                  "ranking": self.ranking, "points": self.point})
             return True
 
         else:
-            Player.users.update({"points": self.point}, {"ranking": self.ranking}, (where('name') == self.name) &
+            Player.users.update({"ranking": self.ranking}, (where('name') == self.name) &
                                 (where("first_name") == self.first_name) & (where('birth') == self.birth)
                                 )
+            Player.users.update({"points": self.point}, (where('name') == self.name) &
+                                (where("first_name") == self.first_name) & (where('birth') == self.birth)
+                                )
+
             return False
 
     def serialization_players(self):
@@ -66,8 +64,7 @@ class Player:
     def player_found(self):
         # retourne l'élément (comme si self.player_found) ou None si l'utilisateur n'existe pas
         return Player.users.get((where('name') == self.name) & (where('first_name') == self.first_name) &
-                                    (where('birth') == self.birth)
-                                    )
+                                (where('birth') == self.birth))
 
     def __str__(self):
         return f"le joueur ID {self.id} = {self.name} {self.first_name}, né le {self.birth}, classé {self.ranking}"
@@ -107,16 +104,17 @@ class Player:
         return one_player
 
 
-
 if __name__ == '__main__':
-    def generateur(matches):
-        for players in matches:
-            yield players
-
-
-    matches = [['1', '7'], ['5', '8'], ['4', '3'], ['6', '2']]
-    couple = generateur(matches)
-    print(next(couple))
+    pass
+    # def generateur(matches):
+    #     for players in matches:
+    #         yield players
+    #
+    #
+    # matches = [['1', '7'], ['5', '8'], ['4', '3'], ['6', '2']]
+    # couple = generateur(matches)
+    # print(next(couple))
+    # # ------------
     # for id_player in couple:
     #     # print(id_player)
     #     player = Player.get_by_id(id=int(id_player))

@@ -25,6 +25,7 @@ class MatchResults:
         """ Permet l'affichage de l'indentité du joueur et non seulement son ID"""
         self.player_1_id = self.matche[0][0]
         self.player_2_id = self.matche[0][1]
+        # A partir des Id des joueurs, collecte les infos dans la base joueurs
         data_1 = MatchResults.users.get(doc_id=int(self.player_1_id))
         data_2 = MatchResults.users.get(doc_id=int(self.player_2_id))
         # cls(name=data['name'], first_name=data['first_name'], birth=data['birth'],
@@ -33,17 +34,16 @@ class MatchResults:
         self.player_1_first_name = data_1["first_name"]
         self.player_2_name = data_2["name"]
         self.player_2_first_name = data_2["first_name"]
-
+        # retroune un print lisible du résutat à saisir
         return f"{self.player_1_first_name} {self.player_1_name}, ID {self.player_1_id}  <= & => " \
                f" {self.player_2_first_name} {self.player_2_name}, ID {self.player_2_id}"
 
     def check_input_winner(self):
         saisie_id = input("Saisissez l'ID gagnant ou N pour matche nul : ")
         print("-" * 70)
-        good_inputs = (self.player_1_id, self.player_2_id, 'n', 'N')
+        good_inputs = (str(self.player_1_id), str(self.player_2_id), 'n', 'N')
         if saisie_id not in good_inputs:
-            print(self.player_1_id, self.player_2_id)
-            print("Attention, la saisie doit être un des ID ou N (pour nul)")
+            print(f"Attention, la saisie doit être un des ID ({self.player_1_id} ou {self.player_2_id}) ou N (pour nul)")
             self.check_input_winner()
         else:
             self.set_winner(saisie_id)

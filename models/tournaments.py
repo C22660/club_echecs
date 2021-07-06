@@ -18,7 +18,8 @@ class Tournament:
     number_of_rounds = 4
 
     def __init__(self, name, place, start_date, end_date, time_control, description=None, players=None, rounds=None,
-                 id=None, number_of_rounds=number_of_rounds):
+                 id=None, number_of_rounds=number_of_rounds, content=users):
+        self.content = content
         self.tournament = []
         self.name = name
         self.place = place
@@ -177,17 +178,22 @@ class Tournament:
 
 
 if __name__ == '__main__':
-    pass
 
     # # 1 liste = [{'Round': 3, 'matches': [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None],
     #     [('6', '2'), None]], 'lancement': None, 'fin': None}]
-    # id_current_tournament = len(Tournament.users)
-    # tournoi = Tournament.get_by_id(id=id_current_tournament)
-    # # print(tournoi.rounds.index)
-    # tournoi.add_rounds(liste)
-    # tournoi.start_current_round()
-    # # print(vars(tournoi))
-    # matches = tournoi.extract_match_to_add_scores()
+    id_current_tournament = len(Tournament.users)
+    # for index, element in enumerate(Tournament.users):
+    #     print(index, element)
+    print(id_current_tournament)
+    tournoi = Tournament.get_by_id(id=id_current_tournament)
+    print("self.tournament = ", tournoi.tournament)
+    print("-----")
+    print("self.ounds = ", tournoi.rounds)
+    print("-----")
+    print("self.players", tournoi.players)
+    print("-----")
+    print("self.content", tournoi.content)
+    print("len self.content", len(tournoi.content))
     # # ---------
     # # # 2 saisie du score
     # # liste = [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None], [('6', '2'), None]]
@@ -217,9 +223,9 @@ if __name__ == '__main__':
     #     score_second_player = element[1][1]
     #     print("joueur", id_second_player, "score", score_second_player)
     # -----
-    id_current_tournament = len(Tournament.users)
-    tournoi = Tournament.get_by_id(id=id_current_tournament)
-    print(tournoi.rounds)
+    # id_current_tournament = len(Tournament.users)
+    # tournoi = Tournament.get_by_id(id=id_current_tournament)
+    # print(tournoi.rounds)
     # result = tournoi.extract_match_to_add_scores()
     # print(result)
     # matches = result[0]
