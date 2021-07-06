@@ -267,27 +267,31 @@ class RoundsController:
 
         Par défaut, l'id du tournoi est le tournoi en cours, soit le dernier des tournois enregistrés"""
 
-    id_tournament = len(Tournament.users)
+    # id_tournament = len(Tournament.users)
 
-    def __init__(self, id_tournament=id_tournament):
-        self.id_tournament = id_tournament
+    def __init__(self):
+        # self.id_tournament = id_tournament
+        self.tournaments = None
 
 
     def __call__(self):
         # au premier tournoi, lors de l'init, self.id_tournament = 0
-        print("test self.id tournment dans round controler = ", self.id_tournament)
-        if self.id_tournament == 0:
-            tournoi = Tournament.get_by_id(id=1)
-            new_id = len(tournoi.content)
-            print("new id dans round controler = ", new_id)
-            tournoi = Tournament.get_by_id(id=new_id)
-
-        else:
-            # aux tournois suivants, le trounoi en cours correspond bien à len(Tournament.users)
-            tournoi = Tournament.get_by_id(id=self.id_tournament)
-
-        result = tournoi.extract_match_to_add_scores()
-        rounds_remaining = tournoi.number_of_rounds_decrement()
+        # print("test self.id tournment dans round controler = ", self.id_tournament)
+        tournoi = Tournament.get_by_id(id=1)
+        self.tournaments = tournoi.search_id_tournaments()
+        id_current_tournament = self.tournaments[-1]
+        # if self.id_tournament == 0:
+        #     tournoi = Tournament.get_by_id(id=1)
+        #     new_id = len(tournoi.content)
+        #     print("new id dans round controler = ", new_id)
+        #     tournoi = Tournament.get_by_id(id=new_id)
+        #
+        # else:
+        #     # aux tournois suivants, le trounoi en cours correspond bien à len(Tournament.users)
+        #     tournoi = Tournament.get_by_id(id=self.id_tournament)
+        current_tournament = Tournament.get_by_id(id=id_current_tournament)
+        result = current_tournament.extract_match_to_add_scores()
+        rounds_remaining = current_tournament.number_of_rounds_decrement()
         print("-----")
         print("dans home roud controller : result = tournoi.extract_match_to_add_scores()")
         print(result)

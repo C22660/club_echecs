@@ -20,7 +20,7 @@ class Tournament:
     def __init__(self, name, place, start_date, end_date, time_control, description=None, players=None, rounds=None,
                  id=None, number_of_rounds=number_of_rounds, content=users):
         self.content = content
-        self.tournament = []
+        self.tournaments = []
         self.name = name
         self.place = place
         self.start_date = start_date
@@ -45,11 +45,11 @@ class Tournament:
         # vérification que le tournoi n'existe pas dans la base
         new_tournament = Tournament.users.get((where('name') == self.name) & (where('place') == self.place))
         if not new_tournament:
-            # ajout dans la liste tournament
-            self.tournament.append([self.name, self.place, self.start_date, self.end_date, self.time_control,
-                                    self.number_of_rounds, self.time_control, self.description, self.rounds,
-                                    self.players]
-                                   )
+            # # ajout dans la liste tournament
+            # self.tournament.append([self.name, self.place, self.start_date, self.end_date, self.time_control,
+            #                         self.number_of_rounds, self.time_control, self.description, self.rounds,
+            #                         self.players]
+            #                        )
             # ajout dans la base de données
             Tournament.users.insert({"name": self.name, "place": self.place, "start_date": self.start_date,
                                      "end_date": self.end_date, "Controle de temps": self.time_control,
@@ -73,6 +73,13 @@ class Tournament:
                    time_control=data['Controle de temps'], description=data['description'], rounds=data['rounds'],
                    players=data['players'], id=id
                    )
+
+    def search_id_tournaments(self):
+        tournaments = Tournament.users.search(where('name') != "")
+        for tournament in tournaments:
+            id_tournament = tournament.doc_id
+            self.tournaments.append(id_tournament)
+        return self.tournaments
 
     def add_players(self, player):
         self.players.append(player)
@@ -186,14 +193,17 @@ if __name__ == '__main__':
     #     print(index, element)
     print(id_current_tournament)
     tournoi = Tournament.get_by_id(id=id_current_tournament)
-    print("self.tournament = ", tournoi.tournament)
-    print("-----")
-    print("self.ounds = ", tournoi.rounds)
-    print("-----")
-    print("self.players", tournoi.players)
-    print("-----")
-    print("self.content", tournoi.content)
-    print("len self.content", len(tournoi.content))
+    tournoi.search_id_tournaments()
+    print("self.tournament = ", tournoi.tournaments)
+    current_tournament = tournoi.tournaments[-1]
+    print(current_tournament)
+    # print("-----")
+    # print("self.ounds = ", tournoi.rounds)
+    # print("-----")
+    # print("self.players", tournoi.players)
+    # print("-----")
+    # print("self.content", tournoi.content)
+    # print("len self.content", len(tournoi.content))
     # # ---------
     # # # 2 saisie du score
     # # liste = [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None], [('6', '2'), None]]
