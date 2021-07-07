@@ -1,4 +1,4 @@
-from tinydb import TinyDB, where
+from tinydb import TinyDB, where, Query
 from pathlib import Path
 
 from tools.timestamp import TimeStamp
@@ -14,6 +14,7 @@ class Tournament:
 
     DB = TinyDB(Path(__file__).resolve().parent / 'db.json', indent=4)
     users = DB.table("Tournaments")
+    User = Query()
 
     number_of_rounds = 4
 
@@ -175,11 +176,12 @@ class Tournament:
 
         for element in tournaments:
             id_tournament = element.doc_id
-            recap_rounds = element["rounds"]
-            for recap_round in recap_rounds:
-                for rounds_per_tournament in recap_round:
-                    recap_matches_by_tournaments.append([id_tournament, rounds_per_tournament['Round'],
-                                                         rounds_per_tournament['matches']])
+            if id_tournament == self.id:
+                recap_rounds = element["rounds"]
+                for recap_round in recap_rounds:
+                    for rounds_per_tournament in recap_round:
+                        recap_matches_by_tournaments.append([id_tournament, rounds_per_tournament['Round'],
+                                                             rounds_per_tournament['matches']])
 
         return recap_matches_by_tournaments
 
@@ -191,12 +193,9 @@ if __name__ == '__main__':
     id_current_tournament = len(Tournament.users)
     # for index, element in enumerate(Tournament.users):
     #     print(index, element)
-    print(id_current_tournament)
     tournoi = Tournament.get_by_id(id=id_current_tournament)
-    tournoi.search_id_tournaments()
-    print("self.tournament = ", tournoi.tournaments)
-    current_tournament = tournoi.tournaments[-1]
-    print(current_tournament)
+    print(tournoi.extract_all_matches_to_report())
+
     # print("-----")
     # print("self.ounds = ", tournoi.rounds)
     # print("-----")
