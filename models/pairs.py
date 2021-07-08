@@ -12,7 +12,6 @@ ne pas faire l'affectation et demander un joueur de plus"""
 
 class Pair:
 
-    # our_players = [{'points': '0', 'ranking': '2100', 'player_ID': '1'}, {'points': '0', 'ranking': '1200', 'player_ID': '2'}, {'points': '0', 'ranking': '1600', 'player_ID': '3'}, {'points': '0', 'ranking': '1800', 'player_ID': '4'}, {'points': '0', 'ranking': '1900', 'player_ID': '5'}, {'points': '0', 'ranking': '1720', 'player_ID': '6'}, {'points': '0', 'ranking': '1700', 'player_ID': '7'}, {'points': '0', 'ranking': '1680', 'player_ID': '8'}]
     our_players = []
 
     def __init__(self, serialization=None):
@@ -24,9 +23,7 @@ class Pair:
 
     def add_players_pairs(self):
         # ajout du joueur provenant de la class Player
-        print("self.our_player avant ajout : ", self.our_players)
         self.our_players.append(self.serialization)
-        print("self.our_player après ajout : ", self.our_players)
 
     def sort_players_ranking(self):
         """Tri premier tour en fonction du rang"""
@@ -51,9 +48,6 @@ class Pair:
         our_evens = []
         our_evens_with_name = []
 
-        # # Solution source docs python, Guide pour le tri, Stabilité des tris et tris complexes
-        # s = sorted(self, key=attrgetter("ranking"), reverse=True)
-        # liste_trie = sorted(s, key=attrgetter("point"), reverse=True)
         s = sorted(self.our_players, key=lambda k: k['ranking'], reverse=True)
         liste_trie = sorted(s, key=lambda k: k['points'], reverse=True)
 

@@ -48,7 +48,7 @@ class Player:
         team_serialized = {"points": self.point, "ranking": self.ranking,
                            "player_ID": self.id, "name": self.name, "first_name": self.first_name
                            }
-        # return type(current_add)
+
         return team_serialized
 
     @classmethod

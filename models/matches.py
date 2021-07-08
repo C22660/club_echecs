@@ -1,4 +1,4 @@
-from tinydb import TinyDB, where
+from tinydb import TinyDB
 from pathlib import Path
 
 
@@ -43,7 +43,8 @@ class MatchResults:
         print("-" * 70)
         good_inputs = (str(self.player_1_id), str(self.player_2_id), 'n', 'N')
         if saisie_id not in good_inputs:
-            print(f"Attention, la saisie doit être un des ID ({self.player_1_id} ou {self.player_2_id}) ou N (pour nul)")
+            print(f"Attention, la saisie doit être un des ID ({self.player_1_id} ou {self.player_2_id})"
+                  f" ou N (pour nul)")
             self.check_input_winner()
         else:
             self.set_winner(saisie_id)
@@ -58,6 +59,7 @@ class MatchResults:
 
         self.matche[1] = self.score
         self.matches.append(self.matche)
+
 
 if __name__ == '__main__':
     # ---------

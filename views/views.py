@@ -5,7 +5,7 @@ class HomeMenuView:
         self.menu = menu
 
     def _display_menu(self):
-        print("**********                  MENU PRINCIPAL                  **********")
+        print("**********                      M E N U                     **********")
         print("-"*70)
         # à partir de la méthode items de la class menu
         for key, entry in self.menu.items():
@@ -27,7 +27,7 @@ class HomeMenuView:
 
 # collece des éléments de création du tournoi
 class TournamentCreationView:
-#     def __init__(self):
+    #     def __init__(self):
     def get_tournament_elements(self):
         print("-"*70)
         print("Pour enregister le tournoi, merci de compléter les champs suivants :")
@@ -51,12 +51,43 @@ class TournamentCreationView:
 
     def get_tournament_time(self):
         time_control = input("Quelle contrôle de temps choisissez vous pour ce tournoi ? \n"
-                     "Bullet, blitz, ou coup rapide ? ")
+                             "Bullet, blitz, ou coup rapide ? ")
         return time_control
 
     def get_trournament_description(self):
         description = input("Commentaires éventuels ? ")
         return description
+
+    def check_name_view(self):
+        print("!" * 70)
+        print("!               Merci de saisir un nom pour ce tournoi               !")
+        print("!" * 70)
+
+    def check_place_view(self):
+        print("!" * 70)
+        print("!           Merci de saisir un nom de lieu pour ce tournoi           !")
+        print("!" * 70)
+
+    def check_start_date_view(self):
+        print("!" * 70)
+        print("! Merci de saisir une date de tournoi, ou de début de tournoi valide !")
+        print("!" * 70)
+
+    def check_end_date_view(self):
+        print("!" * 70)
+        print("! Merci de saisir une date de fin de tournoi valide (même date si jour unique) !")
+        print("!" * 70)
+
+    def info_tournament_recorded(self, numero):
+        print('"' * 70)
+        print(f"         ------INFO-----> Tournoi enregistré sous l'ID {numero}.           ")
+        print('"' * 70)
+
+    def info_trounament_present(self):
+        print('"' * 70)
+        print("         ------INFO-----> Tournoi déjà présent dans la base.        ")
+        print('"' * 70)
+
 
 class PlayersElementsView:
 
@@ -80,7 +111,6 @@ class PlayersElementsView:
         print("-"*70)
         print(f"Pour enregister le joueur {self.counter}, merci de compléter les champs suivants :")
         print("-"*70)
-        # self.counter += 1
 
     def get_new_ranking(self):
         print("-"*70)
@@ -115,11 +145,164 @@ class PlayersElementsView:
         print("Round n°"+round_number)
         point = input(f"Résultats de {self.first_name} {self.name} ? ")
 
+    def check_player_name(self):
+        print("!" * 37)
+        print("! Merci de saisir un nom de famille !")
+        print("!" * 37)
 
-class PlayersModificationView:
+    def check_player_first_name(self):
+        print("!" * 29)
+        print("! Merci de saisir un prénom !")
+        print("!" * 29)
 
-    def __init__(self):
-        self.name = None
-        self.first_name = None
-        self.birth = None
-        self.ranking = None
+    def check_player_birth(self):
+        print("!" * 29)
+        print("! Merci de saisir une date valide (jj/mm/aaaa) !")
+        print("!" * 29)
+
+    def check_player_ranking(self):
+        print("!" * 37)
+        print("! Le classement doit être un nombre !")
+        print("!" * 37)
+
+    def pair_mandatory(self):
+        print("!" * 35)
+        print("! Désolé, nombre pair obligatoire !")
+        print("!" * 35)
+
+    def info_player_present(self):
+        print('"' * 70)
+        print('"------INFO-----> Joueur déjà présent. Seul le rang a été modifié."')
+        print('"' * 70)
+        print("")
+
+    def first_players_pair(self):
+        print("*" * 70)
+        print("*        Les premières paires de joueurs sont les suivantes.         *")
+        print("*    Vous allez être redirigé vers le menu pour lancer le round.     *")
+        print("*                               __  __                               *")
+        print("*                                 \/                                 *")
+
+    def couple_in_our_pairs(self, player_1, player_2):
+        print(f'{player_1} <---&---> {player_2}')
+
+    def ranking_modified(self):
+            print('-'*70)
+            print("Modification de rang enregistrée.")
+            print("Vous allez être redirigé vers le menu principal.")
+            print('-' * 70)
+
+    def player_not_found(self):
+            print('-'*70)
+            print("Désolé, ce joueur n'existe pas.")
+            print("Vous allez être redirigé vers le menu principal.")
+            print('-' * 70)
+
+class RoundsElementsView:
+
+    # def __init__(self):
+    #     self.number = None
+
+    def no_round_remaining(self):
+        print("°" * 70)
+        print("°                   Tous les matches ont été joués                   °")
+        print("°           Vous allez être redirigé sur le menu principal           °")
+        print("°" * 70)
+
+    def all_rounds_remaining(self, number):
+        print("*" * 70)
+        print(f"Il reste tous les {number} rounds à jouer.")
+
+    def how_many_rounds(self, rounds_remaining):
+        print("*" * 70)
+        print(f"Il reste {rounds_remaining} round(s) à jouer.")
+
+    def print_pairs(self, pairs):
+        print("*" * 70)
+        print(" Les paires de joueurs sont : ")
+        for couple in pairs:
+            print(f'{couple[0]} <---&---> {couple[1]}')
+
+
+class MatchesElementsView:
+
+    def wrong_input(self):
+        print("Désolé, erreur de commande.")
+
+    def game_finished(self):
+        print("")
+        print("------> JEU TERMINÉ")
+        print("")
+
+    def results_input_announcement(self):
+        print('"'*70)
+        print("Vous allez procéder à la saisie des résultats")
+        print("")
+
+    def input_results_finished(self):
+        print('-'*70)
+        print("Saisie des résultats terminée.")
+        print("vous allez être redirigé vers le menu pour lancer le round.")
+        print('-'*70)
+
+class ReportsElementsView:
+
+    def wrong_input(self):
+        print("Désolé, erreur de commande.")
+
+    def report_all_actors_title(self):
+        print("'"*70)
+        print("'          R A P P O R T  D E  T O U S  L E S  A C T E U R S         '")
+        print("'" * 70)
+        print("")
+        print(" Liste de tous les acteurs en base de données :")
+        print("-----> par ordre alphabétique : ")
+
+    def actors_by_alpha_view(self, actors_by_alpha):
+        for element in actors_by_alpha:
+            print(f"{element['name']} {element['first_name']}")
+
+    def all_actors_by_ranking_view(self, actors_by_rank):
+        for element in actors_by_rank:
+            print(f"{element['name']} {element['first_name']}, rang : {element['ranking']}")
+
+    def report_all_actors_ranking(self):
+        print("")
+        print("-----> par classement : ")
+
+    def tournements_list_view(self):
+        print("-" * 70)
+        print("Liste du(des) tournoi(s) enregistré(s) :")
+
+    def players_in_tournament(self):
+        print("-"*70)
+        print("Liste de tous les joueurs du tournoi :")
+
+    def players_by_alpha(self,result_by_alpha):
+        print("")
+        print("-----> par ordre alphabétique : ")
+        for element in result_by_alpha:
+            print(f"{element['name']} {element['first_name']}")
+        print("")
+
+    def players_by_ranking(self, result_by_ranking):
+        print("-----> par classement : ")
+        for element in result_by_ranking:
+            print(f"{element['ranking']}, {element['name']} {element['first_name']}")
+        print("")
+
+    def players_by_scrore_title(self):
+        print("-----> par nombre de points gagnés : ")
+
+    def players_by_score_print(self, player, points):
+        print(f"{player} a totalisé {points} point(s).")
+
+    def rounds_and_matches_title(self):
+        print("-"*70)
+        print("Liste de tous les rounds et matches du(des) tournoi(s) :")
+
+    def rounds_and_matches_part_1(self, component):
+        print(f"Pour le tournoi {component[0]}, les matches du round {component[1]} sont : ")
+
+    def rounds_and_matches_part_2(self, i):
+        print(f" joueurs = {i[0]}, score = {i[1]}")

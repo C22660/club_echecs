@@ -17,7 +17,6 @@ class Round:
         # dates et heures, horodatage automatique
         self.start_date_time = None
         self.end_date_time = None
-        self.ranking = None
         self.new_round = Round.creation_new_round(self)
 
     def start_round(self):
@@ -36,7 +35,7 @@ class Round:
             du résultat du matche. Exemple [('1', '7'), None]"""
         matches = []
         for i in self.pairs:
-            matches.append([(i[0], i[1]), (0,0)])
+            matches.append([(i[0], i[1]), (0, 0)])
         self.round[0]["matches"] = matches
         return self.round
 

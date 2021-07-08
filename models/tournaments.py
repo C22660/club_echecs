@@ -119,16 +119,17 @@ class Tournament:
             de rounds restants"""
         index_current_round = 0
         for index, ronde in enumerate(self.rounds):
-            if ronde[0].get("lancement") == None:
+            if ronde[0].get("lancement") is None:
                 index_current_round = index
-            elif ronde[0].get("lancement") != None:
-                index_current_round = index +1
+            elif ronde[0].get("lancement") is not None:
+                index_current_round = index + 1
 
         rounds_remaining = self.number_of_rounds - index_current_round
         return rounds_remaining
 
     def sum_score_of_players(self):
-        current_round_index = len(self.rounds) - 1
+        """Pour le rapport final, va déterminere le joueur qui a comptabilisé le plus de points sur durant un tournoi"""
+        # current_round_index = len(self.rounds) - 1 -> à supprimer si inutile
         all_matches = []
         sum_scores = {}
         # on prépare la dictionnaire sum_score à accueillir un couple clé "ID" une valeur cumul de score
@@ -196,48 +197,3 @@ if __name__ == '__main__':
     tournoi = Tournament.get_by_id(id=id_current_tournament)
     print(tournoi.extract_all_matches_to_report())
 
-    # print("-----")
-    # print("self.ounds = ", tournoi.rounds)
-    # print("-----")
-    # print("self.players", tournoi.players)
-    # print("-----")
-    # print("self.content", tournoi.content)
-    # print("len self.content", len(tournoi.content))
-    # # ---------
-    # # # 2 saisie du score
-    # # liste = [[('1', '7'), None], [('5', '8'), None], [('4', '3'), None], [('6', '2'), None]]
-    # # for i in matches:
-    # #     match = MatchResults(i)
-    # #     print(match.get_players_by_id())
-    # #     saisie = input("Saisissez l'ID gagnant ou N pour matche nul : ")
-    # #     print("-"*47)
-    # #     match.set_winner(saisie)
-    # # results_matches = MatchResults.matches
-    # # results_matches = [[('1', '7'), (1, 0)], [('5', '8'), (0, 1)], [('4', '3'), (0.5, 0.5)], [('6', '2'), (1, 0)]]
-    # results_matches = [[('1', '7'), (1, 0)], [('5', '8'), (0, 1)], [('4', '3'), (0.5, 0.5)], [('6', '2'), (1, 0)]]
-    # tournoi.save_scored_matches(results_matches)
-    # print(tournoi.rounds)
-    # # # # -------
-    # id_current_tournament = len(Tournament.users)
-    # tournoi = Tournament.get_by_id(id=id_current_tournament)
-    # matches = tournoi.extract_match_to_add_scores()
-    # print(matches)
-    # for element in matches:
-    #     id_first_player = element[0][0]
-    #     score_first_player = element[1][0]
-    #     print("joueur", id_first_player, "score", score_first_player)
-    # print("second")
-    # for element in matches:
-    #     id_second_player = element[0][1]
-    #     score_second_player = element[1][1]
-    #     print("joueur", id_second_player, "score", score_second_player)
-    # -----
-    # id_current_tournament = len(Tournament.users)
-    # tournoi = Tournament.get_by_id(id=id_current_tournament)
-    # print(tournoi.rounds)
-    # result = tournoi.extract_match_to_add_scores()
-    # print(result)
-    # matches = result[0]
-    # round_number = result[1]
-    # print("matches = ", matches)
-    # print("round_number", round_number)
