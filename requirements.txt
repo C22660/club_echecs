@@ -1,0 +1,9 @@
+mccabe==0.6.1
+pycodestyle==2.7.0
+pyflakes==2.3.1
+Pygments==2.9.0
+tinydb==4.4.0
+toml==0.10.2
+Unidecode==1.2.0
+untokenize==0.1.1
+zipp==3.5.0

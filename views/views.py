@@ -1,4 +1,3 @@
-
 class HomeMenuView:
 
     def __init__(self, menu):
@@ -6,7 +5,7 @@ class HomeMenuView:
 
     def _display_menu(self):
         print("**********                      M E N U                     **********")
-        print("-"*70)
+        print("-" * 70)
         # à partir de la méthode items de la class menu
         for key, entry in self.menu.items():
             print(f"{key}: {entry.option}")
@@ -29,9 +28,9 @@ class HomeMenuView:
 class TournamentCreationView:
     #     def __init__(self):
     def get_tournament_elements(self):
-        print("-"*70)
+        print("-" * 70)
         print("Pour enregister le tournoi, merci de compléter les champs suivants :")
-        print("-"*70)
+        print("-" * 70)
 
     def get_tournament_name(self):
         name = input("Nom du tournoi ? ").upper()
@@ -100,22 +99,22 @@ class PlayersElementsView:
         self.ranking = None
 
     def size_team(self):
-        print("-"*70)
+        print("-" * 70)
         print("Combien de joueurs voulez vous enregistrer ?")
         print("          Nombre pair obligatoire           ")
-        print("-"*70)
+        print("-" * 70)
         number = input("Nombre de joueurs : ")
         return number
 
     def get_player_elements(self):
-        print("-"*70)
+        print("-" * 70)
         print(f"Pour enregister le joueur {self.counter}, merci de compléter les champs suivants :")
-        print("-"*70)
+        print("-" * 70)
 
     def get_new_ranking(self):
-        print("-"*70)
+        print("-" * 70)
         print(f"Pour modifier le rang d'un joueur, merci de compléter les champs suivants :")
-        print("-"*70)
+        print("-" * 70)
 
     def get_player_name(self):
         self.name = input("Nom de famille du joueur ? ").upper()
@@ -137,13 +136,13 @@ class PlayersElementsView:
         self.ranking = input(f"Classement de {self.first_name} {self.name} ? ")
         return self.ranking
 
-    def add_player_points_view(self, round_number):
-        print("-"*70)
-        print("Pour enregister les points du match, merci de compléter le champ suivant :")
-        print("-"*70)
-        # récupérer les éléments
-        print("Round n°"+round_number)
-        point = input(f"Résultats de {self.first_name} {self.name} ? ")
+    # def add_player_points_view(self, round_number):
+    #     print("-"*70)
+    #     print("Pour enregister les points du match, merci de compléter le champ suivant :")
+    #     print("-"*70)
+    #     # récupérer les éléments
+    #     print("Round n°"+ round_number)
+    #     point = input(f"Résultats de {self.first_name} {self.name} ? ")
 
     def check_player_name(self):
         print("!" * 37)
@@ -187,21 +186,19 @@ class PlayersElementsView:
         print(f'{player_1} <---&---> {player_2}')
 
     def ranking_modified(self):
-            print('-'*70)
-            print("Modification de rang enregistrée.")
-            print("Vous allez être redirigé vers le menu principal.")
-            print('-' * 70)
+        print('-' * 70)
+        print("Modification de rang enregistrée.")
+        print("Vous allez être redirigé vers le menu principal.")
+        print('-' * 70)
 
     def player_not_found(self):
-            print('-'*70)
-            print("Désolé, ce joueur n'existe pas.")
-            print("Vous allez être redirigé vers le menu principal.")
-            print('-' * 70)
+        print('-' * 70)
+        print("Désolé, ce joueur n'existe pas.")
+        print("Vous allez être redirigé vers le menu principal.")
+        print('-' * 70)
+
 
 class RoundsElementsView:
-
-    # def __init__(self):
-    #     self.number = None
 
     def no_round_remaining(self):
         print("°" * 70)
@@ -229,21 +226,27 @@ class MatchesElementsView:
     def wrong_input(self):
         print("Désolé, erreur de commande.")
 
+    def game_launched(self):
+        print("")
+        print("------> JEU EN COURS                                                ")
+        print("")
+
     def game_finished(self):
         print("")
         print("------> JEU TERMINÉ")
         print("")
 
     def results_input_announcement(self):
-        print('"'*70)
+        print('"' * 70)
         print("Vous allez procéder à la saisie des résultats")
         print("")
 
     def input_results_finished(self):
-        print('-'*70)
+        print('-' * 70)
         print("Saisie des résultats terminée.")
         print("vous allez être redirigé vers le menu pour lancer le round.")
-        print('-'*70)
+        print('-' * 70)
+
 
 class ReportsElementsView:
 
@@ -251,7 +254,7 @@ class ReportsElementsView:
         print("Désolé, erreur de commande.")
 
     def report_all_actors_title(self):
-        print("'"*70)
+        print("'" * 70)
         print("'          R A P P O R T  D E  T O U S  L E S  A C T E U R S         '")
         print("'" * 70)
         print("")
@@ -275,10 +278,10 @@ class ReportsElementsView:
         print("Liste du(des) tournoi(s) enregistré(s) :")
 
     def players_in_tournament(self):
-        print("-"*70)
+        print("-" * 70)
         print("Liste de tous les joueurs du tournoi :")
 
-    def players_by_alpha(self,result_by_alpha):
+    def players_by_alpha(self, result_by_alpha):
         print("")
         print("-----> par ordre alphabétique : ")
         for element in result_by_alpha:
@@ -298,7 +301,7 @@ class ReportsElementsView:
         print(f"{player} a totalisé {points} point(s).")
 
     def rounds_and_matches_title(self):
-        print("-"*70)
+        print("-" * 70)
         print("Liste de tous les rounds et matches du(des) tournoi(s) :")
 
     def rounds_and_matches_part_1(self, component):
