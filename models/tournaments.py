@@ -2,7 +2,7 @@ from pathlib import Path
 
 from tinydb import TinyDB, where
 
-from tools.timestamp import TimeStamp
+from ..tools.timestamp import TimeStamp
 
 """Etape 3 Les tournaments correspondent au tournois
 à accès aux rounds et aux pairs"""

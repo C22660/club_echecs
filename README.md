@@ -23,7 +23,7 @@ L'équilibre des couleurs des jeux n'est pas géré par le programme mais via ti
 par le gestionnaire du tournoi.
 
 **Configurations et exécution du programme**
-Le promramme sera executé directement depuis home.py
+Le promramme sera executé directement depuis python -m club_echecs
 
 Etape 1 : Création d'un tournoi (participants compris), ce qui va générer les
 premières paires de joueurs
