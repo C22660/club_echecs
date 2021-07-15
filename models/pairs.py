@@ -48,7 +48,6 @@ class Pair:
 
         return our_evens, our_evens_with_name
 
-
     def sort_players_points(self):
         """Tri tours suivants en fonction des points et, si égalité, du
         rang."""

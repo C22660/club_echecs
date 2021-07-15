@@ -197,8 +197,8 @@ class Tournament:
                 for recap_round in recap_rounds:
                     for rounds_per_tournament in recap_round:
                         recap_matches_by_tournaments.append([id_tournament,
-                                                rounds_per_tournament['Round'],
-                                            rounds_per_tournament['matches']]
+                                                            rounds_per_tournament['Round'],
+                                                            rounds_per_tournament['matches']]
                                                             )
 
         return recap_matches_by_tournaments

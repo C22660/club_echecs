@@ -377,9 +377,8 @@ class ModificationRankingController:
 
         time.sleep(2)
         actions = (("Créer un tournoi", TournamentCreationController()),
-                   ("Saisir la liste des joueurs", PlayersCreationController())
-                   , ("Modifier le rang d'un joueur",
-                      ModificationRankingController()),
+                   ("Saisir la liste des joueurs", PlayersCreationController()),
+                   ("Modifier le rang d'un joueur", ModificationRankingController()),
                    ("Gestion des rounds", RoundsController()),
                    ("Rapport du tournoi", ReportController())
                    )
