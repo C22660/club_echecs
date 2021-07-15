@@ -113,7 +113,7 @@ class PlayersElementsView:
 
     def get_new_ranking(self):
         print("-" * 70)
-        print(f"Pour modifier le rang d'un joueur, merci de compléter les champs suivants :")
+        print("Pour modifier le rang d'un joueur, merci de compléter les champs suivants :")
         print("-" * 70)
 
     def get_player_name(self):
@@ -135,14 +135,6 @@ class PlayersElementsView:
     def get_player_ranking(self):
         self.ranking = input(f"Classement de {self.first_name} {self.name} ? ")
         return self.ranking
-
-    # def add_player_points_view(self, round_number):
-    #     print("-"*70)
-    #     print("Pour enregister les points du match, merci de compléter le champ suivant :")
-    #     print("-"*70)
-    #     # récupérer les éléments
-    #     print("Round n°"+ round_number)
-    #     point = input(f"Résultats de {self.first_name} {self.name} ? ")
 
     def check_player_name(self):
         print("!" * 37)
@@ -179,8 +171,8 @@ class PlayersElementsView:
         print("*" * 70)
         print("*        Les premières paires de joueurs sont les suivantes.         *")
         print("*    Vous allez être redirigé vers le menu pour lancer le round.     *")
-        print("*                               __  __                               *")
-        print("*                                 \/                                 *")
+        print("*                               __   __                              *")
+        print("*                                  V                                 *")
 
     def couple_in_our_pairs(self, player_1, player_2):
         print(f'{player_1} <---&---> {player_2}')
