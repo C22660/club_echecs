@@ -1,0 +1,32 @@
+Une séquence possible de l'application
+- menu d'accueil :
+1. se connecter
+2. Saisir les caractéristiques du tournoi
+3. Saisir la liste des joueurs
+4. Confirmer le lancement du tournoi
+5. Visualisation des pairs du premier round
+6. Lancer le premier round
+7. Stopper le round
+8. Saisir les résultats
+9. Affichage des deuxièmes pairs
+10. Lancer le deuxième round
+11. Stopper le round
+12. Saisir les résultats
+13. Affichage des troisième pairs
+14. Lancer le troisième round
+15. Stopper le round
+16. Saisir les résultats
+17. Affichage des quatrième pairs
+18. Lancer le quatrième round
+19. Stopper le round
+20. Saisir les résultats
+
+
+une fois le 1 selectionner, on arrive sur :
+- menu connection
+puis :
+- retour sur menu d'accueil
+
+Une autre séquence possible de l'application :
+- menu d'accueil
+- demande de commencer une partie. SI l'utilisateur n'est pas connecté -> on va sur se connecter
