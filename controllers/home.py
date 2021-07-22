@@ -1,13 +1,13 @@
 import time
 
-from ..tools.menus import Menu
-from ..views import views
-from ..models.players import Player
-from ..models.pairs import Pair
-from ..models.tournaments import Tournament
-from ..models.rounds import Round
-from ..models.matches import MatchResults
-from ..tools.inputs_check import check_names, check_date
+from tools.menus import Menu
+from views import views
+from models.players import Player
+from models.pairs import Pair
+from models.tournaments import Tournament
+from models.rounds import Round
+from models.matches import MatchResults
+from tools.inputs_check import check_names, check_date
 
 # 1 ApplicationController est le chef d'orchestre
 

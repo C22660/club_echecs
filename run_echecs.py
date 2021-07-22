@@ -1,4 +1,4 @@
-from .controllers import home
+from controllers import home
 
 
 def main():

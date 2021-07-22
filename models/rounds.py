@@ -1,4 +1,4 @@
-from ..tools.timestamp import TimeStamp
+from tools.timestamp import TimeStamp
 
 """etape 2 Les rounds correspondent au parties jouées (au tours)"""
 
