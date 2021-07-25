@@ -472,7 +472,7 @@ class ReportController:
         result_by_ranking = sorted(self.player_by_alpha, key=lambda
                                    k: k['ranking'], reverse=True
                                    )
-        self.view.players_by_alpha(result_by_ranking)
+        self.view.players_by_ranking(result_by_ranking)
 
         # par nombre de points gagnés
         result = tournoi.sum_score_of_players()
